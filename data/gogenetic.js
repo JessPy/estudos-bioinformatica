@@ -1,0 +1,856 @@
+// Módulo especializado: biologia aplicada aos relatórios da Conhecimento comercial.
+// Fonte dos indicadores: relatórios-modelo e bancos internos lidos em 30/10/2026 (ver GG.sources).
+// Dados de clientes NÃO são reproduzidos aqui — apenas a estrutura dos relatórios e os conceitos.
+
+Object.assign(window.MAT, {
+  // ---- Métodos / ecologia ----
+  knight2018: { t: "Knight et al. 2018 — Best practices for analysing microbiomes", u: "https://doi.org/10.1038/s41579-018-0029-9", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  johnson2019: { t: "Johnson et al. 2019 — Evaluation of 16S rRNA gene sequencing for species and strain-level analysis", u: "https://doi.org/10.1038/s41467-019-13036-1", k: "artigo", n: 2, s: "Nature Communications" },
+  louca2018: { t: "Louca, Doebeli & Parfrey 2018 — Correcting for 16S rRNA gene copy numbers remains an unsolved problem", u: "https://doi.org/10.1186/s40168-018-0420-9", k: "artigo", n: 2, s: "Microbiome" },
+  nilsson2019: { t: "Nilsson et al. 2019 — Mycobiome diversity: high-throughput sequencing and identification of fungi", u: "https://doi.org/10.1038/s41579-018-0116-y", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  schoch2012: { t: "Schoch et al. 2012 — Nuclear ribosomal ITS region as a universal DNA barcode for Fungi", u: "https://doi.org/10.1073/pnas.1117018109", k: "artigo", n: 2, s: "PNAS" },
+  vandeputte2017: { t: "Vandeputte et al. 2017 — Quantitative microbiome profiling links gut community variation to microbial load", u: "https://doi.org/10.1038/nature24460", k: "artigo", n: 3, s: "Nature" },
+  salter2014: { t: "Salter et al. 2014 — Reagent and laboratory contamination can critically impact sequence-based microbiome analyses", u: "https://doi.org/10.1186/s12915-014-0087-z", k: "artigo", n: 2, s: "BMC Biology" },
+  eisenhofer2019: { t: "Eisenhofer et al. 2019 — Contamination in low microbial biomass microbiome studies", u: "https://doi.org/10.1016/j.tim.2018.11.003", k: "artigo", n: 2, s: "Trends in Microbiology" },
+  willis2019: { t: "Willis 2019 — Rarefaction, Alpha Diversity, and Statistics", u: "https://doi.org/10.3389/fmicb.2019.02407", k: "artigo", n: 2, s: "Frontiers in Microbiology" },
+  mcmurdie2014: { t: "McMurdie & Holmes 2014 — Waste Not, Want Not: why rarefying microbiome data is inadmissible", u: "https://doi.org/10.1371/journal.pcbi.1003531", k: "artigo", n: 3, s: "PLOS Comput. Biol." },
+  chao2014: { t: "Chao, Chiu & Jost 2014 — Unifying species diversity, phylogenetic diversity... through Hill numbers", u: "https://doi.org/10.1146/annurev-ecolsys-120213-091540", k: "artigo", n: 3, s: "Annu. Rev. Ecol. Evol. Syst." },
+  martiny2015: { t: "Martiny et al. 2015 — Microbiomes in light of traits: a phylogenetic perspective", u: "https://doi.org/10.1126/science.aac9323", k: "artigo", n: 3, s: "Science" },
+  faprotax: { t: "Louca, Parfrey & Doebeli 2016 — Decoupling function and taxonomy in the global ocean microbiome (FAPROTAX)", u: "https://doi.org/10.1126/science.aaf4507", k: "artigo", n: 3, s: "Science" },
+  funguild: { t: "Nguyen et al. 2016 — FUNGuild: an open annotation tool for parsing fungal community datasets by ecological guild", u: "https://doi.org/10.1016/j.funeco.2015.06.006", k: "artigo", n: 2, s: "Fungal Ecology" },
+  picrust2: { t: "Douglas et al. 2020 — PICRUSt2 for prediction of metagenome functions", u: "https://doi.org/10.1038/s41587-020-0548-6", k: "artigo", n: 2, s: "Nature Biotechnology" },
+  sun2020: { t: "Sun, Jones & Fodor 2020 — Inference-based accuracy of metagenome prediction tools varies across sample types and functional categories", u: "https://doi.org/10.1186/s40168-020-00815-y", k: "artigo", n: 3, s: "Microbiome" },
+  // ---- Agro / solo ----
+  lugtenberg2009: { t: "Lugtenberg & Kamilova 2009 — Plant-growth-promoting rhizobacteria", u: "https://doi.org/10.1146/annurev.micro.62.081307.162918", k: "artigo", n: 1, s: "Annual Review of Microbiology" },
+  glick2012: { t: "Glick 2012 — Plant growth-promoting bacteria: mechanisms and applications", u: "https://doi.org/10.6064/2012/963401", k: "artigo", n: 1, s: "Scientifica" },
+  compant2010: { t: "Compant, Clément & Sessitsch 2010 — Plant growth-promoting bacteria in the rhizo- and endosphere", u: "https://doi.org/10.1016/j.soilbio.2009.11.024", k: "artigo", n: 2, s: "Soil Biology & Biochemistry" },
+  hoffman2014: { t: "Hoffman et al. 2014 — Mechanism of nitrogen fixation by nitrogenase: the next stage", u: "https://doi.org/10.1021/cr400641x", k: "artigo", n: 3, s: "Chemical Reviews" },
+  dixon2004: { t: "Dixon & Kahn 2004 — Genetic regulation of biological nitrogen fixation", u: "https://doi.org/10.1038/nrmicro954", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  oldroyd2013: { t: "Oldroyd 2013 — Speak, friend, and enter: signalling systems that promote beneficial symbiotic associations in plants", u: "https://doi.org/10.1038/nrmicro2990", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  hungria2010: { t: "Hungria et al. 2010 — Inoculation with selected strains of Azospirillum brasilense and A. lipoferum improves yields of maize and wheat in Brazil", u: "https://doi.org/10.1007/s11104-009-0262-0", k: "artigo", n: 2, s: "Plant and Soil" },
+  xie2014: { t: "Xie et al. 2014 — Comparative genomic analysis of N2-fixing and non-N2-fixing Paenibacillus spp.", u: "https://doi.org/10.1371/journal.pgen.1004231", k: "artigo", n: 3, s: "PLOS Genetics" },
+  kuypers2018: { t: "Kuypers, Marchant & Kartal 2018 — The microbial nitrogen-cycling network", u: "https://doi.org/10.1038/nrmicro.2018.9", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  richardson2011: { t: "Richardson & Simpson 2011 — Soil microorganisms mediating phosphorus availability", u: "https://doi.org/10.1104/pp.111.175448", k: "artigo", n: 2, s: "Plant Physiology" },
+  rodriguez1999: { t: "Rodríguez & Fraga 1999 — Phosphate solubilizing bacteria and their role in plant growth promotion", u: "https://doi.org/10.1016/S0734-9750(99)00014-2", k: "artigo", n: 1, s: "Biotechnology Advances" },
+  bashan2013: { t: "Bashan, Kamnev & de-Bashan 2013 — Tricalcium phosphate is inappropriate as a universal selection factor for P-solubilizing bacteria", u: "https://doi.org/10.1007/s11104-012-1402-5", k: "artigo", n: 2, s: "Plant and Soil" },
+  kramer2020: { t: "Kramer, Özkaya & Kümmerli 2020 — Bacterial siderophores in community and host interactions", u: "https://doi.org/10.1038/s41579-019-0284-4", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  hider2010: { t: "Hider & Kong 2010 — Chemistry and biology of siderophores", u: "https://doi.org/10.1039/b906679a", k: "artigo", n: 3, s: "Natural Product Reports" },
+  may2001: { t: "May, Wendrich & Marahiel 2001 — The dhb operon of Bacillus subtilis encodes the biosynthetic template for bacillibactin", u: "https://doi.org/10.1074/jbc.M009592200", k: "artigo", n: 3, s: "J. Biological Chemistry" },
+  spaepen2007: { t: "Spaepen, Vanderleyden & Remans 2007 — Indole-3-acetic acid in microbial and microorganism-plant signaling", u: "https://doi.org/10.1111/j.1574-6976.2007.00072.x", k: "artigo", n: 2, s: "FEMS Microbiology Reviews" },
+  glick2014: { t: "Glick 2014 — Bacteria with ACC deaminase can promote plant growth and help to feed the world", u: "https://doi.org/10.1016/j.micres.2013.09.009", k: "artigo", n: 2, s: "Microbiological Research" },
+  ryu2003: { t: "Ryu et al. 2003 — Bacterial volatiles promote growth in Arabidopsis", u: "https://doi.org/10.1073/pnas.0730845100", k: "artigo", n: 2, s: "PNAS" },
+  idris2007: { t: "Idris et al. 2007 — Tryptophan-dependent production of IAA affects plant growth promotion by Bacillus amyloliquefaciens FZB42", u: "https://doi.org/10.1094/MPMI-20-6-0619", k: "artigo", n: 3, s: "Mol. Plant-Microbe Interactions" },
+  pieterse2014: { t: "Pieterse et al. 2014 — Induced systemic resistance by beneficial microbes", u: "https://doi.org/10.1146/annurev-phyto-082712-102340", k: "artigo", n: 2, s: "Annual Review of Phytopathology" },
+  ongena2008: { t: "Ongena & Jacques 2008 — Bacillus lipopeptides: versatile weapons for plant disease biocontrol", u: "https://doi.org/10.1016/j.tim.2007.12.009", k: "artigo", n: 2, s: "Trends in Microbiology" },
+  fira2018: { t: "Fira et al. 2018 — Biological control of plant pathogens by Bacillus species", u: "https://doi.org/10.1016/j.jbiotec.2018.07.044", k: "artigo", n: 1, s: "Journal of Biotechnology" },
+  fan2018: { t: "Fan et al. 2018 — Bacillus velezensis FZB42 in 2018: the Gram-positive model strain for plant growth promotion and biocontrol", u: "https://doi.org/10.3389/fmicb.2018.02491", k: "artigo", n: 2, s: "Frontiers in Microbiology" },
+  chen2007: { t: "Chen et al. 2007 — Comparative analysis of the complete genome sequence of B. amyloliquefaciens FZB42", u: "https://doi.org/10.1038/nbt1325", k: "artigo", n: 3, s: "Nature Biotechnology" },
+  chen2009: { t: "Chen et al. 2009 — Difficidin and bacilysin produced by plant-associated Bacillus are efficient in controlling fire blight", u: "https://doi.org/10.1016/j.jbiotec.2008.10.011", k: "artigo", n: 3, s: "Journal of Biotechnology" },
+  stein2005: { t: "Stein 2005 — Bacillus subtilis antibiotics: structures, syntheses and specific functions", u: "https://doi.org/10.1111/j.1365-2958.2005.04587.x", k: "artigo", n: 2, s: "Molecular Microbiology" },
+  dunlap2016: { t: "Dunlap et al. 2016 — Bacillus velezensis is not a later heterotypic synonym of B. amyloliquefaciens", u: "https://doi.org/10.1099/ijsem.0.000858", k: "artigo", n: 3, s: "IJSEM" },
+  gupta2020: { t: "Gupta et al. 2020 — Robust demarcation of 17 distinct Bacillus species clades (Priestia e outros gêneros)", u: "https://doi.org/10.1099/ijsem.0.004475", k: "artigo", n: 3, s: "IJSEM" },
+  harman2004: { t: "Harman et al. 2004 — Trichoderma species: opportunistic, avirulent plant symbionts", u: "https://doi.org/10.1038/nrmicro797", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  bravo2007: { t: "Bravo, Gill & Soberón 2007 — Mode of action of Bacillus thuringiensis Cry and Cyt toxins", u: "https://doi.org/10.1016/j.toxicon.2006.11.022", k: "artigo", n: 2, s: "Toxicon" },
+  ehling2019: { t: "Ehling-Schulz, Lereclus & Koehler 2019 — The Bacillus cereus group: Bacillus species with pathogenic potential", u: "https://doi.org/10.1128/microbiolspec.GPP3-0032-2018", k: "artigo", n: 2, s: "Microbiology Spectrum" },
+  fierer2017: { t: "Fierer 2017 — Embracing the unknown: disentangling the complexities of the soil microbiome", u: "https://doi.org/10.1038/nrmicro.2017.87", k: "artigo", n: 1, s: "Nature Reviews Microbiology" },
+  fiererJackson2006: { t: "Fierer & Jackson 2006 — The diversity and biogeography of soil bacterial communities", u: "https://doi.org/10.1073/pnas.0507535103", k: "artigo", n: 2, s: "PNAS" },
+  philippot2013: { t: "Philippot et al. 2013 — Going back to the roots: the microbial ecology of the rhizosphere", u: "https://doi.org/10.1038/nrmicro3109", k: "artigo", n: 1, s: "Nature Reviews Microbiology" },
+  berendsen2012: { t: "Berendsen, Pieterse & Bakker 2012 — The rhizosphere microbiome and plant health", u: "https://doi.org/10.1016/j.tplants.2012.04.001", k: "artigo", n: 1, s: "Trends in Plant Science" },
+  mendes2011: { t: "Mendes et al. 2011 — Deciphering the rhizosphere microbiome for disease-suppressive bacteria", u: "https://doi.org/10.1126/science.1203980", k: "artigo", n: 2, s: "Science" },
+  weller2002: { t: "Weller et al. 2002 — Microbial populations responsible for specific soil suppressiveness to plant pathogens", u: "https://doi.org/10.1146/annurev.phyto.40.030402.110010", k: "artigo", n: 2, s: "Annual Review of Phytopathology" },
+  schlatter2017: { t: "Schlatter et al. 2017 — Disease suppressive soils: new insights from the soil microbiome", u: "https://doi.org/10.1094/PHYTO-03-17-0111-RVW", k: "artigo", n: 2, s: "Phytopathology" },
+  bardgett2014: { t: "Bardgett & van der Putten 2014 — Belowground biodiversity and ecosystem functioning", u: "https://doi.org/10.1038/nature13855", k: "artigo", n: 2, s: "Nature" },
+  wagg2014: { t: "Wagg et al. 2014 — Soil biodiversity and soil community composition determine ecosystem multifunctionality", u: "https://doi.org/10.1073/pnas.1320054111", k: "artigo", n: 2, s: "PNAS" },
+  delgado2016: { t: "Delgado-Baquerizo et al. 2016 — Microbial diversity drives multifunctionality in terrestrial ecosystems", u: "https://doi.org/10.1038/ncomms10541", k: "artigo", n: 2, s: "Nature Communications" },
+  parniske2008: { t: "Parniske 2008 — Arbuscular mycorrhiza: the mother of plant root endosymbioses", u: "https://doi.org/10.1038/nrmicro1987", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  jiang2017: { t: "Jiang et al. 2017 — Plants transfer lipids to sustain colonization by mycorrhizal fungi", u: "https://doi.org/10.1126/science.aam9970", k: "artigo", n: 3, s: "Science" },
+  karst2023: { t: "Karst et al. 2023 — Positive citation bias and overinterpreted results lead to misinformation on common mycorrhizal networks", u: "https://doi.org/10.1038/s41559-023-01986-1", k: "artigo", n: 2, s: "Nature Ecology & Evolution" },
+  tedersoo2014: { t: "Tedersoo et al. 2014 — Global diversity and geography of soil fungi", u: "https://doi.org/10.1126/science.1256688", k: "artigo", n: 2, s: "Science" },
+  // ---- Intestino ----
+  sender2016: { t: "Sender, Fuchs & Milo 2016 — Revised estimates for the number of human and bacteria cells in the body", u: "https://doi.org/10.1371/journal.pbio.1002533", k: "artigo", n: 1, s: "PLOS Biology" },
+  lynch2016: { t: "Lynch & Pedersen 2016 — The human intestinal microbiome in health and disease", u: "https://doi.org/10.1056/NEJMra1600266", k: "artigo", n: 1, s: "New England Journal of Medicine" },
+  fan2021: { t: "Fan & Pedersen 2021 — Gut microbiota in human metabolic health and disease", u: "https://doi.org/10.1038/s41579-020-0433-9", k: "artigo", n: 2, s: "Nature Reviews Microbiology" },
+  olesen2016: { t: "Olesen & Alm 2016 — Dysbiosis is not an answer", u: "https://doi.org/10.1038/nmicrobiol.2016.228", k: "artigo", n: 1, s: "Nature Microbiology" },
+  falony2016: { t: "Falony et al. 2016 — Population-level analysis of gut microbiome variation", u: "https://doi.org/10.1126/science.aad3503", k: "artigo", n: 2, s: "Science" },
+  vandeputte2016: { t: "Vandeputte et al. 2016 — Stool consistency is strongly associated with gut microbiota richness and composition", u: "https://doi.org/10.1136/gutjnl-2015-309618", k: "artigo", n: 2, s: "Gut" },
+  maier2018: { t: "Maier et al. 2018 — Extensive impact of non-antibiotic drugs on human gut bacteria", u: "https://doi.org/10.1038/nature25979", k: "artigo", n: 2, s: "Nature" },
+  forslund2015: { t: "Forslund et al. 2015 — Disentangling type 2 diabetes and metformin treatment signatures in the gut microbiota", u: "https://doi.org/10.1038/nature15766", k: "artigo", n: 3, s: "Nature" },
+  koh2016: { t: "Koh et al. 2016 — From dietary fiber to host physiology: short-chain fatty acids as key bacterial metabolites", u: "https://doi.org/10.1016/j.cell.2016.05.041", k: "artigo", n: 2, s: "Cell" },
+  louis2017: { t: "Louis & Flint 2017 — Formation of propionate and butyrate by the human colonic microbiota", u: "https://doi.org/10.1111/1462-2920.13589", k: "artigo", n: 2, s: "Environmental Microbiology" },
+  litvak2018: { t: "Litvak, Byndloss & Bäumler 2018 — Colonocyte metabolism shapes the gut microbiota", u: "https://doi.org/10.1126/science.aat9076", k: "artigo", n: 3, s: "Science" },
+  devkota2012: { t: "Devkota et al. 2012 — Dietary-fat-induced taurocholic acid promotes pathobiont expansion (Bilophila wadsworthia)", u: "https://doi.org/10.1038/nature11225", k: "artigo", n: 3, s: "Nature" },
+  triantafyllou2014: { t: "Triantafyllou, Chang & Pimentel 2014 — Methanogens, methane and gastrointestinal motility", u: "https://doi.org/10.5056/jnm.2014.20.1.31", k: "artigo", n: 2, s: "J. Neurogastroenterol. Motil." },
+  belkaid2014: { t: "Belkaid & Hand 2014 — Role of the microbiota in immunity and inflammation", u: "https://doi.org/10.1016/j.cell.2014.03.011", k: "artigo", n: 2, s: "Cell" },
+  peterson2014: { t: "Peterson & Artis 2014 — Intestinal epithelial cells: regulators of barrier function and immune homeostasis", u: "https://doi.org/10.1038/nri3608", k: "artigo", n: 2, s: "Nature Reviews Immunology" },
+  johansson2016: { t: "Johansson & Hansson 2016 — Immunological aspects of intestinal mucus and mucins", u: "https://doi.org/10.1038/nri.2016.88", k: "artigo", n: 3, s: "Nature Reviews Immunology" },
+  smith2013: { t: "Smith et al. 2013 — Short-chain fatty acids regulate colonic Treg cell homeostasis", u: "https://doi.org/10.1126/science.1241165", k: "artigo", n: 3, s: "Science" },
+  furusawa2013: { t: "Furusawa et al. 2013 — Commensal microbe-derived butyrate induces colonic regulatory T cells", u: "https://doi.org/10.1038/nature12721", k: "artigo", n: 3, s: "Nature" },
+  sokol2008: { t: "Sokol et al. 2008 — Faecalibacterium prausnitzii is an anti-inflammatory commensal bacterium", u: "https://doi.org/10.1073/pnas.0804812105", k: "artigo", n: 2, s: "PNAS" },
+  mazmanian2008: { t: "Mazmanian, Round & Kasper 2008 — A microbial symbiosis factor prevents intestinal inflammatory disease", u: "https://doi.org/10.1038/nature07008", k: "artigo", n: 3, s: "Nature" },
+  plovier2017: { t: "Plovier et al. 2017 — A purified membrane protein from Akkermansia muciniphila improves metabolism", u: "https://doi.org/10.1038/nm.4236", k: "artigo", n: 3, s: "Nature Medicine" },
+  henke2019: { t: "Henke et al. 2019 — Ruminococcus gnavus produces an inflammatory polysaccharide (glucorhamnan)", u: "https://doi.org/10.1073/pnas.1904099116", k: "artigo", n: 3, s: "PNAS" },
+  shin2015: { t: "Shin, Whon & Bae 2015 — Proteobacteria: microbial signature of dysbiosis in gut microbiota", u: "https://doi.org/10.1016/j.tibtech.2015.06.011", k: "artigo", n: 1, s: "Trends in Biotechnology" },
+  kostic2013: { t: "Kostic et al. 2013 — Fusobacterium nucleatum potentiates intestinal tumorigenesis", u: "https://doi.org/10.1016/j.chom.2013.07.007", k: "artigo", n: 3, s: "Cell Host & Microbe" },
+  ley2006: { t: "Ley et al. 2006 — Human gut microbes associated with obesity", u: "https://doi.org/10.1038/4441022a", k: "artigo", n: 2, s: "Nature" },
+  walters2014: { t: "Walters, Xu & Knight 2014 — Meta-analyses of human gut microbes associated with obesity and IBD", u: "https://doi.org/10.1016/j.febslet.2014.09.039", k: "artigo", n: 2, s: "FEBS Letters" },
+  magne2020: { t: "Magne et al. 2020 — The Firmicutes/Bacteroidetes ratio: a relevant marker of gut dysbiosis in obese patients?", u: "https://doi.org/10.3390/nu12051474", k: "artigo", n: 1, s: "Nutrients" },
+  arumugam2011: { t: "Arumugam et al. 2011 — Enterotypes of the human gut microbiome", u: "https://doi.org/10.1038/nature09944", k: "artigo", n: 2, s: "Nature" },
+  costea2018: { t: "Costea et al. 2018 — Enterotypes in the landscape of gut microbial community composition", u: "https://doi.org/10.1038/s41564-017-0072-8", k: "artigo", n: 2, s: "Nature Microbiology" },
+  magnusdottir2015: { t: "Magnúsdóttir et al. 2015 — Systematic genome assessment of B-vitamin biosynthesis suggests co-operation among gut microbes", u: "https://doi.org/10.3389/fgene.2015.00148", k: "artigo", n: 3, s: "Frontiers in Genetics" },
+  leblanc2013: { t: "LeBlanc et al. 2013 — Bacteria as vitamin suppliers to their host: a gut microbiota perspective", u: "https://doi.org/10.1016/j.copbio.2012.08.005", k: "artigo", n: 2, s: "Current Opinion in Biotechnology" },
+  hill2014: { t: "Hill et al. 2014 — ISAPP consensus statement on the scope and appropriate use of the term probiotic", u: "https://doi.org/10.1038/nrgastro.2014.66", k: "artigo", n: 1, s: "Nature Reviews Gastroenterology & Hepatology" },
+  zheng2020: { t: "Zheng et al. 2020 — Taxonomic note on the genus Lactobacillus: 23 novel genera", u: "https://doi.org/10.1099/ijsem.0.004107", k: "artigo", n: 2, s: "IJSEM" },
+  duvallet2017: { t: "Duvallet et al. 2017 — Meta-analysis of gut microbiome studies identifies disease-specific and shared responses", u: "https://doi.org/10.1038/s41467-017-01973-8", k: "artigo", n: 2, s: "Nature Communications" },
+  garcialopez2019: { t: "García-López et al. 2019 — Analysis of 1,000 type-strain genomes improves taxonomic classification of Bacteroidetes (Phocaeicola)", u: "https://doi.org/10.3389/fmicb.2019.02083", k: "artigo", n: 3, s: "Frontiers in Microbiology" },
+  oren2021: { t: "Oren & Garrity 2021 — Valid publication of the names of forty-two phyla of prokaryotes (Bacillota, Bacteroidota...)", u: "https://doi.org/10.1099/ijsem.0.005056", k: "artigo", n: 2, s: "IJSEM" },
+  // ---- Genoma ----
+  richter2009: { t: "Richter & Rosselló-Móra 2009 — Shifting the genomic gold standard for the prokaryotic species definition (ANI)", u: "https://doi.org/10.1073/pnas.0906412106", k: "artigo", n: 2, s: "PNAS" },
+  jain2018: { t: "Jain et al. 2018 — High throughput ANI analysis of 90K prokaryotic genomes (FastANI)", u: "https://doi.org/10.1038/s41467-018-07641-9", k: "artigo", n: 2, s: "Nature Communications" },
+  skani: { t: "Shaw & Yu 2023 — Fast and robust metagenomic sequence comparison through sparse chaining with skani", u: "https://doi.org/10.1038/s41592-023-02018-3", k: "artigo", n: 3, s: "Nature Methods" },
+  spades2012: { t: "Bankevich et al. 2012 — SPAdes: a new genome assembly algorithm", u: "https://doi.org/10.1089/cmb.2012.0021", k: "artigo", n: 2, s: "J. Computational Biology" },
+  prokka: { t: "Seemann 2014 — Prokka: rapid prokaryotic genome annotation", u: "https://doi.org/10.1093/bioinformatics/btu153", k: "artigo", n: 1, s: "Bioinformatics" },
+  checkm: { t: "Parks et al. 2015 — CheckM: assessing the quality of microbial genomes", u: "https://doi.org/10.1101/gr.186072.114", k: "artigo", n: 2, s: "Genome Research" },
+  gtdbtk: { t: "Chaumeil et al. 2020 — GTDB-Tk: a toolkit to classify genomes with the Genome Taxonomy Database", u: "https://doi.org/10.1093/bioinformatics/btz848", k: "artigo", n: 2, s: "Bioinformatics" },
+  metabolic: { t: "Zhou et al. 2022 — METABOLIC: high-throughput profiling of microbial genomes for functional traits", u: "https://doi.org/10.1186/s40168-021-01213-8", k: "artigo", n: 2, s: "Microbiome" },
+  diamond: { t: "Buchfink, Xie & Huson 2015 — Fast and sensitive protein alignment using DIAMOND", u: "https://doi.org/10.1038/nmeth.3176", k: "artigo", n: 2, s: "Nature Methods" },
+  antismash7: { t: "Blin et al. 2023 — antiSMASH 7.0", u: "https://doi.org/10.1093/nar/gkad344", k: "artigo", n: 2, s: "Nucleic Acids Research" },
+  antismashDocs: { t: "antiSMASH — documentação e servidor", u: "https://antismash.secondarymetabolites.org/", k: "doc", n: 2, s: "antiSMASH" },
+  mibig: { t: "Medema et al. 2015 — Minimum Information about a Biosynthetic Gene cluster (MIBiG)", u: "https://doi.org/10.1038/nchembio.1890", k: "artigo", n: 3, s: "Nature Chemical Biology" },
+  fischbach2006: { t: "Fischbach & Walsh 2006 — Assembly-line enzymology for polyketide and nonribosomal peptide antibiotics", u: "https://doi.org/10.1021/cr0503097", k: "artigo", n: 3, s: "Chemical Reviews" },
+  sussmuth2017: { t: "Süssmuth & Mainz 2017 — Nonribosomal peptide synthesis: principles and prospects", u: "https://doi.org/10.1002/anie.201609079", k: "artigo", n: 3, s: "Angewandte Chemie" },
+  arnison2013: { t: "Arnison et al. 2013 — Ribosomally synthesized and post-translationally modified peptide natural products (RiPPs)", u: "https://doi.org/10.1039/c2np20085f", k: "artigo", n: 3, s: "Natural Product Reports" },
+  vfdb: { t: "Liu et al. 2022 — VFDB 2022: virulence factor database", u: "https://doi.org/10.1093/nar/gkab1107", k: "artigo", n: 2, s: "Nucleic Acids Research" },
+});
+
+window.GG = {
+  updated: "2026-10-30",
+  sources: [
+    { doc: "Relatorio_Bioinsumo_4_amostras.pdf (GG-FO081 – V1)", path: "Documents/gogenetic/relatorio_modelo/", what: "Estrutura do relatório Bioinsumo: benéficos, biocontroles, fitopatógenos, contaminantes, oportunistas, Portaria IBAMA 180/2024 e notas técnicas" },
+    { doc: "Relatório Solos (exemplo de entrega, 36 p.)", path: "Documents/gogenetic/Solos/", what: "Risco de doenças, saúde do solo, biocontroladores por classe de ação, biodiversidade e perfil microbiológico" },
+    { doc: "banco_de_microrganismos_interesse_jun2026.csv", path: "Documents/gogenetic/Solos/bancos_Solos/", what: "2.965 espécies × 59 colunas de atributos funcionais (fixação, solubilização, sideróforos, micorriza, fitormônios, biocontrole, fitopatogenicidade)" },
+    { doc: "historico_indices (carbono, fosfato, biodiversidade, risco de doenças)", path: "Documents/gogenetic/Solos/bancos_Solos/historico_indices/", what: "Componentes dos índices e normalização pelo histórico" },
+    { doc: "Microbiota_Intestinal_16S_ITS.pptx (modelo)", path: "Documents/gogenetic/goVaginal/Conhecimento comercial Vaginal-Microbioma/data/Relatorio/", what: "Índices do relatório intestinal da Conhecimento comercial Vaginal e disclaimers" },
+    { doc: "banco_inflamario.json, valores_referencia.json, src/Indice*.py, src/Enterotipo.py", path: "Documents/gogenetic/goVaginal/Conhecimento comercial Vaginal-Microbioma/", what: "Faixas de referência e regras de cálculo dos índices" },
+    { doc: "Relatorio_Genoma_Roxo.pdf e relatório de genoma de exemplo (isolado identificado como B. velezensis)", path: "Documents/gogenetic/relatorio_modelo/ e genoma/relatorios_exemplo/", what: "Montagem, ANI, vias de potencial agronômico, enzimas, BGCs do antiSMASH, ciclo do N e virulência" },
+  ],
+  products: [
+    // =============================================================
+    {
+      id: "base", name: "Fundamentos comuns: metabarcoding e inferência funcional", brand: "Conhecimento comercial", report: "Base de Bioinsumo, Solos e Conhecimento comercial Vaginal",
+      indicators: ["Abundância relativa (16S e ITS)", "Diversidade alfa: Gini-Simpson, Chao1, Shannon, Pielou", "Atribuição funcional por banco curado", "Funções preditas (PICRUSt2)"],
+      topics: [
+        {
+          id: "B1", t: "Do DNA à tabela de abundâncias: 16S, ITS e suas limitações",
+          fund: [
+            "Gene 16S rRNA (~1.500 pb): regiões conservadas (onde ancoram os primers) intercaladas com 9 regiões hipervariáveis (V1–V9) que carregam o sinal taxonômico. Amplicons curtos (uma ou duas regiões) perdem resolução.",
+            "Região ITS (ITS1–5.8S–ITS2) entre os genes 18S e 28S: barcode oficial de fungos (Schoch et al. 2012). Varia muito em comprimento entre táxons, o que gera viés de amplificação e de sequenciamento.",
+            "Fluxo: extração de DNA total → PCR do marcador → sequenciamento Illumina → remoção de erros e inferência de ASVs (DADA2) → classificação contra banco de referência (SILVA, GTDB, UNITE) → tabela de contagens → abundância relativa.",
+            "O resultado é composicional: cada valor é uma fração das leituras da amostra. Se um táxon aumenta, os demais 'diminuem' mesmo sem mudar em número absoluto (Gloor et al. 2017; Vandeputte et al. 2017).",
+            "Número de cópias do 16S varia de 1 a mais de 10 por genoma; táxons com muitas cópias são superestimados (Louca et al. 2018). A correção por número de cópias continua imprecisa.",
+            "Resolução: gênero costuma ser confiável; espécie muitas vezes não. Grupos como Bacillus subtilis/velezensis/amyloliquefaciens, Escherichia/Shigella e o grupo B. cereus são praticamente indistinguíveis por 16S parcial (Johnson et al. 2019).",
+          ],
+          key: ["Genes: 16S rRNA (rrs), ITS1/ITS2, 18S", "Ferramentas: QIIME 2, DADA2, classificador naive Bayes", "Bancos: SILVA, GTDB (usado no pipeline Conhecimento comercial Vaginal — ver taxonomy.qza de exemplo), UNITE", "Conceitos: ASV, profundidade de sequenciamento, rarefação, contaminação de reagentes (kitome)"],
+          refs: ["knight2018", "johnson2019", "louca2018", "nilsson2019", "schoch2012", "vandeputte2017", "salter2014", "callahan2016", "bolyen2019"],
+          rel: [
+            "Conforme os relatórios Bioinsumo, Solos e Conhecimento comercial Vaginal, todos usam 16S (bactérias) e ITS (fungos) em Illumina NextSeq e reportam abundância relativa.",
+            "A nota técnica 2 do Bioinsumo (GG-FO081 – V1) explica o viés de número de cópias e diz que a abundância é 'estimativa da representatividade genética, e não contagem celular' — exatamente o ponto de Louca et al. 2018.",
+            "A nota técnica 1 do Bioinsumo cita a reclassificação de espécies de Bacillus para Priestia (Gupta et al. 2020).",
+            "O Solos explica 'indet.' (não identificável pela técnica ou desconhecido) e 'não-cultivado' (sequência conhecida, organismo nunca isolado).",
+            "No pipeline da Conhecimento comercial Vaginal, a taxonomia de exemplo é GTDB (ex.: p__Firmicutes_A; s__Faecalibacterium prausnitzii_G) e o código remove sufixos como _A/_G antes de buscar os nomes nos bancos.",
+          ],
+          interp: [
+            "Leia '% de um táxon' como 'fração das sequências do marcador atribuídas a esse táxon nesta amostra'.",
+            "Nome de espécie vindo de 16S é uma hipótese: confirme com a confiança da classificação e, quando importa (patógeno, cepa do produto), com método específico (qPCR, gene gyrB/rpoB, genoma).",
+            "Ausência = não detectado acima do limite da técnica naquela profundidade, não ausência comprovada.",
+          ],
+          lim: [
+            "Pode concluir: presença de DNA do táxon e composição relativa estimada.",
+            "Não pode concluir: viabilidade (DNA de células mortas é amplificado), atividade/expressão, carga absoluta, identidade de cepa.",
+            "Amostras de baixa biomassa são vulneráveis a contaminantes de kit e de laboratório (Salter et al. 2014; Eisenhofer et al. 2019) — controles negativos são essenciais.",
+          ],
+          ch: [
+            "Simule: duas espécies com o mesmo número de células, uma com 1 cópia de 16S e outra com 10. Calcule a abundância relativa observada e escreva como explicaria isso a um cliente.",
+            "No taxonomy.qza de exemplo da Conhecimento comercial Vaginal, conte quantas ASVs têm espécie atribuída com confiança ≥ 0,9 e quantas param no gênero.",
+            "Escreva um parágrafo para um cliente que pergunta: 'O relatório mostrou 15% de Bacillus subtilis; isso prova que meu produto tem a cepa declarada?'",
+          ],
+        },
+        {
+          id: "B2", t: "Diversidade alfa e por que 'mais diverso' nem sempre é melhor",
+          fund: [
+            "Riqueza = número de táxons. Chao1 estima a riqueza total a partir de singletons e doubletons (táxons vistos 1 e 2 vezes).",
+            "Shannon (H') combina riqueza e equitabilidade; Simpson mede dominância (probabilidade de dois indivíduos sorteados serem do mesmo táxon); Gini-Simpson = 1 − Simpson (quanto maior, menor a dominância).",
+            "Pielou (J = H'/ln S) mede uniformidade: 1 = todos os táxons com a mesma abundância.",
+            "Números de Hill unificam essas medidas por uma ordem q (q=0 riqueza, q=1 exp(Shannon), q=2 inverso de Simpson) (Chao et al. 2014).",
+            "Profundidade de sequenciamento afeta a diversidade observada; rarefação é prática comum, mas debatida (McMurdie & Holmes 2014; Willis 2019).",
+            "Armadilha técnica: DADA2 descarta singletons, então Chao1 calculado sobre ASVs de DADA2 tende a ser igual à riqueza observada — o estimador perde sentido.",
+          ],
+          key: ["Índices: Chao1, Shannon, Simpson/Gini-Simpson, Pielou, números de Hill", "Conceitos: rarefação, curva de acumulação, equitabilidade, dominância"],
+          refs: ["chao2014", "willis2019", "mcmurdie2014", "msmb"],
+          rel: [
+            "O Solos usa quatro índices — Dominância (Gini-Simpson), Riqueza (Chao1), Diversidade (Shannon) e Uniformidade (Pielou) — e um índice global de biodiversidade. O histórico de índices guarda mínimos e máximos históricos usados para normalizar (banco_de_dados_historico_indices_biodiversidade.tsv).",
+            "Na Conhecimento comercial Vaginal, a Qualidade Geral é calculada em src/IndiceGeral.py como 0,9 × diversidade − 0,1 × patógenos + 0,1 × probióticos (limitada a 0–10), com diversidade em profundidade de 19.000 leituras.",
+            "O Bioinsumo apresenta diversidade de bactérias e fungos no resumo.",
+          ],
+          interp: [
+            "Índice normalizado pelo histórico = posição da amostra em relação às amostras já analisadas pela Conhecimento comercial, não em relação a um padrão ecológico absoluto.",
+            "Num bioinsumo, a expectativa é baixa diversidade (dominância do agente declarado): alta diversidade sugere contaminação.",
+            "No solo e no intestino, diversidade é associada a resiliência, mas a relação não é linear nem causal por si só.",
+          ],
+          lim: [
+            "Comparar índices de amostras com profundidades diferentes sem rarefação ou modelagem é enviesado.",
+            "Chao1 com DADA2 (sem singletons) é pouco informativo.",
+            "A diversidade de fezes varia com consistência e tempo de trânsito (Vandeputte et al. 2016), um confundidor importante na Conhecimento comercial Vaginal.",
+          ],
+          ch: [
+            "Calcule à mão (ou em Python) os quatro índices do Solos para uma tabela de 6 táxons e confira com scikit-bio.",
+            "Demonstre com dados simulados que, sem singletons, Chao1 = riqueza observada.",
+            "Com a fórmula de IndiceGeral.py, calcule quanto a Qualidade Geral muda quando a diversidade cai 1 ponto vs. quando os patógenos sobem 1 ponto. O que isso diz sobre o que o índice realmente mede?",
+          ],
+        },
+        {
+          id: "B3", t: "Do táxon à função: bancos curados, predição funcional e níveis de evidência",
+          fund: [
+            "Três formas de inferir função: (1) mapear táxons a atributos descritos na literatura (como FAPROTAX e FUNGuild); (2) predizer o conteúdo gênico a partir do 16S (PICRUSt2); (3) medir genes diretamente (metagenômica shotgun, genoma) ou o fenótipo (ensaios).",
+            "Atributos têm graus diferentes de conservação filogenética: funções complexas (fotossíntese, metanogênese) são conservadas; funções simples ou transferidas horizontalmente (resistência, alguns metabólitos) variam entre cepas da mesma espécie (Martiny et al. 2015).",
+            "PICRUSt2 estima genes pela proximidade filogenética a genomas de referência; a acurácia cai em ambientes pouco representados nos bancos (solos, por exemplo) e para categorias funcionais específicas (Sun et al. 2020).",
+            "Níveis de evidência para uma função atribuída a uma espécie: genoma (potencial) → ensaio in vitro → casa de vegetação → campo com repetição e controle.",
+          ],
+          key: ["Ferramentas: FAPROTAX, FUNGuild, PICRUSt2, bancos internos Conhecimento comercial", "Conceitos: conservação filogenética de atributos, transferência horizontal, variação entre cepas"],
+          refs: ["martiny2015", "faprotax", "funguild", "picrust2", "sun2020"],
+          rel: [
+            "O banco de microrganismos de interesse do Solos (jun/2026) tem 2.965 espécies e 59 colunas: fitopatogênica, fixadora de nitrogênio, solubilizadora, micorriza, produtora de fitormônio, biocontrole e alvo, sideróforos, segurança alimentar, referências e sinônimos.",
+            "Os relatórios Bioinsumo e Solos listam 'microrganismos benéficos' cruzando as espécies detectadas com esse tipo de banco.",
+            "Índices de carbono e fósforo (histórico Solos) e de vitaminas (Conhecimento comercial Vaginal, src/IndiceVitaminas.py) usam funções preditas pelo PICRUSt2 (EC numbers).",
+          ],
+          interp: [
+            "Um selo funcional significa 'há relato na literatura para esta espécie (frequentemente para uma cepa específica)'. Não significa que a população na amostra expresse essa função.",
+            "Índice funcional predito = estimativa indireta e relativa; compare entre amostras do mesmo tipo, não como medida absoluta.",
+          ],
+          lim: [
+            "Cobertura de referências no banco de jun/2026: fixadoras 355 espécies com 43 referências preenchidas; micorrízicas 410 com 2; produtoras de sideróforos 119 com 4.",
+            "Atributos descritos em uma cepa são estendidos à espécie inteira.",
+            "Predição por 16S não detecta genes plasmidiais nem variação entre cepas.",
+          ],
+          ch: [
+            "Sorteie 10 espécies marcadas como 'fixadora' ou 'solubilizadora' no banco e encontre a evidência primária de cada uma. Classifique o nível (genoma, in vitro, casa de vegetação, campo) e proponha um campo 'nível_evidência' para o banco.",
+            "Escreva uma nota técnica de 1 página: 'O que um selo funcional significa nos relatórios Conhecimento comercial'.",
+          ],
+        },
+      ],
+    },
+    // =============================================================
+    {
+      id: "agro", name: "Bioinsumo — bioinsumos", brand: "Conhecimento comercial Agro", report: "Relatorio_Bioinsumo_4_amostras.pdf (GG-FO081 – V1)",
+      indicators: ["Perfil e diversidade de bactérias e fungos", "Distribuição de grupos funcionais", "Indicador de potenciais fitopatógenos por cultura", "Benéficos: promotores de crescimento, fixadores de N, solubilizadores (P e K), produtores de sideróforos, micorrízicos, produtores de fitormônios", "Biocontrole: alvos (nematicida, inseticida, antifúngico, antibacteriano) × mecanismos (antibiose e toxinas, competição, parasitismo e predação, indução de resistência)", "Fitopatógenos", "Potenciais contaminantes", "Patógenos oportunistas (21 táxons)", "Lista negativa da Portaria IBAMA 180/2024"],
+      topics: [
+        {
+          id: "A1", t: "Bioinsumos: o que é qualidade e o que o sequenciamento consegue verificar",
+          fund: [
+            "Bioinsumos incluem inoculantes (ex.: Bradyrhizobium, Azospirillum), biofertilizantes e agentes de biocontrole (ex.: Bacillus, Trichoderma, Beauveria, Metarhizium).",
+            "Qualidade de um bioinsumo tem quatro eixos: identidade (é a espécie/cepa declarada?), concentração viável (UFC/mL ou g), pureza (ausência de contaminantes e patógenos) e estabilidade (vida de prateleira).",
+            "Produção on-farm e fermentações com controle asséptico deficiente favorecem contaminação por microrganismos de crescimento rápido (Enterobacteriaceae, outros Bacillus, leveduras).",
+            "Formas de resistência explicam a estabilidade: endósporos em Bacillus (regulados por Spo0A) e conídios em Trichoderma resistem melhor ao armazenamento do que células vegetativas de Gram-negativas.",
+            "Regulação no Brasil: MAPA (registro de produtos e a Lei dos Bioinsumos, Lei 15.070/2024 — confira o texto oficial) e a 'lista negativa' do IBAMA citada no relatório (Portaria 180/2024).",
+          ],
+          key: ["Agentes comuns: Bacillus spp., Trichoderma spp., Bradyrhizobium spp., Azospirillum brasilense, Beauveria bassiana, Metarhizium anisopliae, Pseudomonas spp.", "Conceitos: UFC, pureza, shelf-life, endósporo"],
+          refs: ["lugtenberg2009", "glick2012", "fira2018", "harman2004", "salter2014"],
+          rel: [
+            "Conforme o relatório Bioinsumo (GG-FO081 – V1), as seções são: Resumo, Microrganismos benéficos, Biocontroles, Fitopatogênicos, Potenciais contaminantes, Patógenos oportunistas e Portaria 180/2024 IBAMA.",
+            "A seção de contaminantes interpreta microrganismos não-alvo como competição por recursos, menor concentração final do agente, menor vida de prateleira e risco sanitário.",
+          ],
+          interp: [
+            "Perfil esperado de um produto monoespecífico: dominância quase total do gênero declarado; outros táxons em baixa abundância podem ser contaminação real, contaminação de reagente ou index hopping.",
+            "Compare com controles negativos de extração e PCR da mesma corrida antes de concluir contaminação.",
+          ],
+          lim: [
+            "Sequenciamento não mede UFC nem viabilidade.",
+            "16S não separa as espécies do grupo B. subtilis — identidade de espécie/cepa exige genoma ou marcador específico.",
+            "Recomendações de dose e momento de aplicação (citadas no guia de interpretação do relatório) dependem de ensaios agronômicos, não do perfil de DNA.",
+          ],
+          ch: [
+            "Desenhe um fluxo de confirmação para um produto com 8% de Enterobacteriaceae: plaqueamento seletivo, qPCR e identificação por genoma. Que resultado mudaria a recomendação?",
+            "Liste o que o Bioinsumo consegue afirmar sobre identidade, concentração, pureza e estabilidade — e o que precisaria de outro ensaio.",
+          ],
+        },
+        {
+          id: "A2", t: "Fixação biológica de nitrogênio",
+          fund: [
+            "O N₂ tem ligação tripla muito estável. A nitrogenase reduz N₂ a amônia: N₂ + 8 H⁺ + 8 e⁻ + 16 ATP → 2 NH₃ + H₂ + 16 ADP + 16 Pi — processo muito caro em energia (Hoffman et al. 2014).",
+            "Complexo enzimático: proteína Fe (NifH) transfere elétrons para a proteína MoFe (NifDK), que contém o cofator FeMo-co; NifENB participam da síntese do cofator. Existem nitrogenases alternativas (V e Fe).",
+            "A nitrogenase é inativada por O₂. Estratégias: leghemoglobina no nódulo, proteção respiratória (Azotobacter), heterocistos em cianobactérias, micronichos anóxicos.",
+            "Regulação: NifA ativa os genes nif; NifL (em proteobactérias) e o sistema PII/GlnB integram sinais de O₂ e de nitrogênio — amônio disponível reprime a fixação (Dixon & Kahn 2004).",
+            "Simbiose rizóbio-leguminosa: flavonoides da raiz → fatores Nod (genes nodABC) → cordão de infecção → bacteroides no nódulo (Oldroyd 2013). Fixação associativa: Azospirillum coloniza a superfície e o interior das raízes de gramíneas e também produz AIA.",
+            "Caso brasileiro: inoculação de soja com Bradyrhizobium substitui a adubação nitrogenada; Azospirillum brasilense (cepas Ab-V5 e Ab-V6) aumenta rendimento de milho e trigo (Hungria et al. 2010).",
+          ],
+          key: ["Genes: nifH, nifD, nifK, nifENB, nifA, nodABC", "Gêneros: Bradyrhizobium (B. japonicum, B. elkanii, B. diazoefficiens), Rhizobium (feijão), Azospirillum, Azotobacter, Paenibacillus polymyxa (possui cluster nif — Xie et al. 2014)", "Enzima: nitrogenase (Mo-, V-, Fe-)"],
+          refs: ["hoffman2014", "dixon2004", "oldroyd2013", "hungria2010", "xie2014", "kuypers2018"],
+          rel: [
+            "O Bioinsumo cita fixadores simbióticos (Bradyrhizobium) e de vida livre/associativos (Azospirillum, Azotobacter) e diz que convertem N₂ em 'amônia e nitrato'. Correção: a nitrogenase produz amônia; nitrato vem da nitrificação, feita por outros grupos.",
+            "No banco do Solos (jun/2026), os gêneros mais frequentes entre as 355 espécies fixadoras são Bradyrhizobium (40), Clostridium (26), Bacillus (19), Rhizobium (7), Caldicellulosiruptor, Geobacter e Desulfovibrio.",
+            "O relatório de genoma avalia 'Fixação biológica' com o METABOLIC; no isolado de exemplo (B. velezensis) a via não foi identificada — o que é esperado para a espécie.",
+          ],
+          interp: [
+            "DNA de Bradyrhizobium no solo ≠ nodulação eficiente: depende da cepa (competitividade, especificidade com a cultivar), do N mineral no solo, de molibdênio e do pH.",
+            "Em genoma, exija o conjunto mínimo nifHDK + nifENB antes de afirmar capacidade de fixação.",
+          ],
+          lim: [
+            "Muitos 'fixadores' do banco são anaeróbios (Clostridium, Geobacter, Desulfovibrio) com genes nif: relevantes em micronichos anóxicos, mas não equivalentes a inoculantes agronômicos.",
+            "A maioria das espécies de Bacillus sensu stricto não possui genes nif; relatos antigos de fixação em Bacillus (ensaio de redução de acetileno) devem ser verificados no genoma. Paenibacillus é o caso bem documentado na família.",
+          ],
+          ch: [
+            "Procure nifH, nifD e nifK na anotação Prokka do isolado de exemplo e em um genoma público de Paenibacillus polymyxa. Escreva o resultado como faria em um relatório.",
+            "Revise o parágrafo do Bioinsumo sobre fixadores com a química correta.",
+            "Explique a um agrônomo por que Clostridium aparecer como 'fixador' no solo não significa benefício para a soja.",
+          ],
+        },
+        {
+          id: "A3", t: "Solubilização de fósforo e potássio; sideróforos e ferro",
+          fund: [
+            "Fósforo no solo: precipitado com Fe e Al em solos ácidos (caso dos Latossolos tropicais, de alta fixação de P), com Ca em solos alcalinos, e em formas orgânicas (fitato) (Richardson & Simpson 2011).",
+            "Solubilização inorgânica: ácidos orgânicos (glucônico, 2-cetoglucônico, cítrico, oxálico, málico, lático, acético) acidificam e quelam Ca, Fe e Al, liberando fosfato. Em Gram-negativas, o ácido glucônico vem da glicose desidrogenase periplasmática dependente de PQQ (genes gcd e pqqA–E) (Rodríguez & Fraga 1999).",
+            "Mineralização do P orgânico: fosfatases ácidas e alcalinas (PhoA, PhoD, PhoX), fitases (ex.: fitase β-hélice em Bacillus) e C-P liases. O regulon de falta de fosfato (PhoR/PhoB) e o transportador Pst controlam a captação.",
+            "Potássio: liberado de minerais silicatados por ácidos orgânicos, polissacarídeos extracelulares e quelação.",
+            "Sideróforos: o Fe³⁺ é muito insolúvel em pH neutro. Bactérias e fungos secretam quelantes de altíssima afinidade — catecolatos (enterobactina, bacilibactina), hidroxamatos (ferrioxaminas), carboxilatos e tipos mistos (pioverdina de Pseudomonas) — captados por receptores TonB-dependentes (Hider & Kong 2010).",
+            "Ecologia: sideróforos são bens públicos (há trapaceiros que captam sideróforos alheios) e funcionam como arma de biocontrole, privando patógenos de ferro (Kramer et al. 2020). A contribuição direta para a nutrição de Fe da planta existe, mas é variável.",
+          ],
+          key: ["Genes: gcd, pqqABCDE, phoA/phoD/phoX, phy/appA, pstSCAB, dhbACEBF (bacilibactina), entCEBA (enterobactina), pvd (pioverdina)", "Gêneros (banco Solos): solubilizadores — Bacillus, Pseudomonas, Streptomyces; Aspergillus, Penicillium, Mortierella. Sideróforos — Bacillus, Pseudomonas, Streptomyces; Aspergillus, Mortierella"],
+          refs: ["richardson2011", "rodriguez1999", "bashan2013", "kramer2020", "hider2010", "may2001"],
+          rel: [
+            "O Bioinsumo define solubilizadores (P e K) por ácidos orgânicos e fosfatases. No texto de sideróforos, repete 'liberando nutrientes retidos nas argilas', que descreve solubilização e não captação de ferro.",
+            "O Solos afirma que sideróforos aumentam a disponibilidade de ferro, alumínio, cobre, cálcio e zinco para as plantas — o alumínio é fitotóxico e a afinidade principal é por Fe³⁺.",
+            "O relatório de genoma avalia ácidos orgânicos (acético, glucônico, lático, málico, oxálico) e transporte/assimilação de fosfato; no isolado de exemplo, todos menos o oxálico. O antiSMASH detectou bacilibactina (sideróforo catecolato).",
+          ],
+          interp: [
+            "O teste em ágar Pikovskaya (fosfato tricálcico) prevê mal o desempenho em solos onde o P está ligado a Fe e Al (Bashan et al. 2013).",
+            "Ácidos orgânicos são rapidamente consumidos por outros microrganismos e tamponados pelo solo: o efeito no campo é menor que in vitro.",
+          ],
+          lim: [
+            "Potencial genômico para produzir ácido orgânico não informa quanto é produzido, nem em que condição.",
+            "Detecção por 16S de um gênero 'solubilizador' não quantifica P disponibilizado — só a análise química do solo responde isso.",
+          ],
+          ch: [
+            "Reescreva os textos de sideróforos do Bioinsumo e do Solos com base em Kramer et al. 2020.",
+            "Desenhe um ensaio de solubilização que use fontes de P relevantes para Latossolos (FePO₄, AlPO₄, fitato), não só fosfato tricálcico.",
+            "No genoma de exemplo, encontre o operon dhb e explique como a bacilibactina pode contribuir para biocontrole.",
+          ],
+        },
+        {
+          id: "A4", t: "Promoção de crescimento e fitormônios",
+          fund: [
+            "Mecanismos diretos: fornecimento de nutrientes, produção de fitormônios, redução de etileno e compostos voláteis. Indiretos: biocontrole e indução de resistência (Glick 2012; Compant et al. 2010).",
+            "Auxina (AIA): rotas dependentes de triptofano — indol-3-piruvato (gene ipdC/ppdC), indol-3-acetamida (iaaM/iaaH, típica de patógenos), indol-3-acetonitrila e triptamina. Efeito dose-dependente: AIA em excesso inibe o alongamento radicular (Spaepen et al. 2007).",
+            "ACC desaminase (gene acdS) degrada ACC, precursor do etileno; menos etileno sob estresse = menos inibição de crescimento radicular (Glick 2014).",
+            "Citocininas e giberelinas também são produzidas por algumas bactérias e fungos (Gibberella fujikuroi é a origem histórica do nome giberelina).",
+            "Voláteis: acetoína e 2,3-butanodiol de Bacillus promovem crescimento e induzem resistência (Ryu et al. 2003; genes alsS, alsD, bdhA).",
+            "Ácido salicílico, jasmonato e ácido abscísico são, sobretudo, hormônios de sinalização da planta; a biossíntese bacteriana dessas moléculas é pouco caracterizada.",
+          ],
+          key: ["Genes: ipdC/ppdC, iaaM/iaaH, acdS, alsS/alsD/bdhA", "Organismos: Azospirillum brasilense (AIA), Bacillus velezensis FZB42 (AIA dependente de triptofano — Idris et al. 2007), Pseudomonas spp. com ACC desaminase", "Gêneros no banco Solos (produtores de fitormônio): Bacillus, Pseudomonas, Streptomyces, Rhizobium, Azospirillum; Aspergillus, Mortierella"],
+          refs: ["glick2012", "compant2010", "spaepen2007", "glick2014", "ryu2003", "idris2007"],
+          rel: [
+            "O Bioinsumo descreve produtores de auxinas, giberelinas e citocininas; o Solos inclui etileno.",
+            "O relatório de genoma avalia Auxinas, Jasmonato, Giberelinas, Ácido salicílico, Degradação de etileno e Ácido abscísico. Para o isolado de exemplo (B. velezensis): 'não revelou potencial biossintético'.",
+            "Contraste importante: a literatura mostra produção de AIA dependente de triptofano em B. velezensis FZB42 (Idris et al. 2007). O pipeline pode não detectar porque as enzimas envolvidas são promíscuas (aminotransferases e descarboxilases sem gene marcador exclusivo).",
+          ],
+          interp: [
+            "'Via não identificada' no genoma = ausência dos marcadores definidos pela ferramenta, não prova de que o organismo não produz o hormônio.",
+            "Os relatórios não avaliam voláteis (acetoína/2,3-butanodiol), um mecanismo relevante em Bacillus.",
+          ],
+          lim: [
+            "O ensaio de Salkowski (colorimétrico) detecta outros indóis além do AIA; confirmação requer HPLC ou LC-MS.",
+            "Efeito em planta depende de dose, genótipo e ambiente.",
+          ],
+          ch: [
+            "Na anotação Prokka do isolado de exemplo, procure genes candidatos da rota do indol-3-piruvato e de acetoína/2,3-butanodiol (alsS, alsD, bdhA). Escreva uma nota sobre o que o relatório poderia acrescentar.",
+            "Desenhe um experimento para confirmar AIA: meio com e sem triptofano, LC-MS e bioensaio radicular.",
+          ],
+        },
+        {
+          id: "A5", t: "Biocontrole e o gênero Bacillus em profundidade",
+          fund: [
+            "Antibiose: lipopeptídeos cíclicos (surfactina, iturina/bacilomicina, fengicina), policetídeos (bacilaeno, dificidina, macrolactina), dipeptídeo bacilisina e bacteriocinas/lantibióticos (Ongena & Jacques 2008; Stein 2005).",
+            "Surfactina: biossurfactante; age em membranas, permite swarming e formação de biofilme e é eliciadora de resistência sistêmica. Fengicina: forte contra fungos filamentosos. Iturinas: antifúngicas por poros na membrana.",
+            "Bacilisina: dipeptídeo cuja porção anticapsina inibe a glucosamina-6-fosfato sintase. Dificidina e bacilisina controlam Erwinia amylovora (Chen et al. 2009).",
+            "Competição: colonização rápida da rizosfera (biofilme dependente de TasA e EPS, regulado por SinR/SlrR), consumo de nutrientes e sequestro de ferro.",
+            "Parasitismo e predação: micoparasitismo de Trichoderma (quitinases, β-1,3-glucanases; Harman et al. 2004), fungos nematófagos e entomopatogênicos (Beauveria, Metarhizium).",
+            "Indução de resistência sistêmica (ISR): mediada por jasmonato/etileno e NPR1, distinta da SAR (ácido salicílico) (Pieterse et al. 2014). Toxinas Cry/Cyt de B. thuringiensis formam poros no intestino de insetos (Bravo et al. 2007).",
+            "Biologia de Bacillus: Gram-positivo formador de endósporo; esporulação comandada por Spo0A; competência e quorum sensing (ComX/ComP/ComA, sistemas Rap/Phr); metabólitos secundários produzidos sobretudo na fase estacionária; respiração de nitrato em anaerobiose (narGHJI).",
+            "A enzima Sfp (fosfopanteteinil transferase) é essencial para NRPS e PKS; a cepa de laboratório B. subtilis 168 tem sfp inativo e não produz surfactina — 'B. subtilis' não é sinônimo de biocontrole.",
+            "Taxonomia em movimento: B. velezensis é distinta de B. amyloliquefaciens e absorveu B. methylotrophicus e B. amyloliquefaciens subsp. plantarum (Dunlap et al. 2016); várias espécies foram movidas para novos gêneros como Priestia (ex.: Priestia megaterium) (Gupta et al. 2020).",
+          ],
+          key: ["Operons: srfA (surfactina), fen/pps (fengicina), itu/bmy (iturina/bacilomicina), pks/bae (bacilaeno), dfn (dificidina), mln (macrolactina), bac (bacilisina), dhb (bacilibactina), sfp", "Espécies: B. velezensis (FZB42, cepa-modelo de biocontrole), B. subtilis, B. amyloliquefaciens, B. licheniformis, B. pumilus, B. thuringiensis (Cry), grupo B. cereus (atenção à segurança), Priestia megaterium", "Fungos: Trichoderma harzianum/asperellum, Clonostachys rosea, Beauveria, Metarhizium"],
+          refs: ["ongena2008", "stein2005", "fan2018", "chen2007", "chen2009", "fira2018", "harman2004", "pieterse2014", "bravo2007", "dunlap2016", "gupta2020"],
+          rel: [
+            "O Bioinsumo mostra mapas de calor de alvos (nematicida, inseticida, antifúngico, antibacteriano) × mecanismos (Antibiose e Toxinas, Competição, Parasitismo e Predação, Indução de Resistência).",
+            "O Solos detalha classes por alvo — nematicidas: competição, endoparasitismo, ovos, biotoxinas, predação; inseticidas: antibiose, indução, parasitismo; fungicidas: antibiose, competição, indução, parasitismo; bactericidas: antibiose, competição, indução.",
+            "No banco Solos, entre os biocontroles: bactérias Bacillus (34), Clostridium (23), Pseudomonas (17), Streptomyces (13); fungos Trichoderma (26), Aspergillus (23), Metarhizium (9).",
+            "O genoma de exemplo (B. velezensis) traz surfactina, fengicina, bacilaeno, dificidina, macrolactina H, bacilisina, bacilibactina e um lantipeptídeo classe II — o repertório típico da espécie.",
+          ],
+          interp: [
+            "O 'potencial' dos mapas de calor resulta de literatura associada aos táxons detectados e de sua abundância; não é medida de eficácia.",
+            "A mesma espécie pode ser biocontrole ou patógeno conforme a cepa: Aspergillus flavus aparece na lista de oportunistas, mas cepas atoxigênicas de A. flavus são usadas no biocontrole de aflatoxina.",
+          ],
+          lim: [
+            "Atividade depende da cepa, da colonização e do ambiente; produção de lipopeptídeos in planta é muito menor que em cultura.",
+            "Clostridium e Aspergillus entre os principais 'biocontroles' do banco exigem revisão da evidência e da segurança.",
+          ],
+          ch: [
+            "Monte uma tabela: cada mecanismo do Bioinsumo → moléculas → genes → como confirmar em laboratório (cultura pareada, LC-MS, ensaio em planta).",
+            "Explique, com Dunlap et al. 2016 e Gupta et al. 2020, por que um produto rotulado 'B. subtilis' pode ser B. velezensis.",
+            "Revise as entradas de Clostridium marcadas como biocontrole no banco: qual a evidência e o alvo?",
+          ],
+        },
+        {
+          id: "A6", t: "Segurança: fitopatógenos, contaminantes, oportunistas e lista negativa",
+          fund: [
+            "Patógeno oportunista: causa doença sobretudo em hospedeiros vulneráveis (Pseudomonas aeruginosa, Klebsiella pneumoniae, Enterobacter, Acinetobacter baumannii), frequentemente com resistência a antimicrobianos.",
+            "Grupo B. cereus: B. cereus, B. thuringiensis e B. anthracis são quase idênticos no 16S; a diferença está em plasmídeos e toxinas (Ehling-Schulz et al. 2019).",
+            "Shigella está filogeneticamente dentro de Escherichia coli; 16S não as separa.",
+            "Fitopatógenos quarentenários e listas regulatórias usam nível de espécie, às vezes de patovar ou forma specialis — resolução que o metabarcoding raramente atinge.",
+          ],
+          key: ["Oportunistas listados no Bioinsumo: 21 táxons (ex.: A. baumannii, A. flavus, A. fumigatus, B. anthracis, C. perfringens, K. pneumoniae, Listeria, P. aeruginosa, Salmonella, S. aureus)", "Lista negativa IBAMA: bactérias, fungos e agentes de saúde animal (ex.: Xylella fastidiosa, Ralstonia solanacearum, Xanthomonas sp., Brucella spp., Mycoplasma spp.)"],
+          refs: ["ehling2019", "johnson2019", "salter2014"],
+          rel: [
+            "As seções 04 a 07 do Bioinsumo tratam de fitopatógenos ('o bioinsumo pode atuar como vetor'), contaminantes, oportunistas (21 táxons) e a lista negativa da Portaria IBAMA 180/2024.",
+          ],
+          interp: [
+            "Hit em nível de gênero contra lista de espécies → resultado inconclusivo, não positivo.",
+            "Hit em táxon indistinguível por 16S (ex.: 'B. anthracis') precisa de confirmação por marcador específico antes de qualquer comunicação.",
+          ],
+          lim: [
+            "'Não detectado' depende de profundidade e limite de detecção.",
+            "Contaminação de laboratório pode produzir falsos positivos em baixa abundância.",
+          ],
+          ch: [
+            "Classifique os 21 oportunistas e a lista do IBAMA em: resolvível por 16S/ITS; resolvível só ao nível de gênero; não resolvível.",
+            "Escreva uma árvore de decisão: quando um hit de patógeno num bioinsumo exige reanálise, confirmação ou comunicação imediata ao cliente.",
+          ],
+        },
+      ],
+    },
+    // =============================================================
+    {
+      id: "Vaginal", name: "Conhecimento comercial Vaginal — relatório intestinal", brand: "Conhecimento comercial Vaginal", report: "Modelo Microbiota_Intestinal_16S_ITS.pptx + pipeline Conhecimento comercial Vaginal-Microbioma",
+      indicators: ["Qualidade Geral (0–10)", "Enterotipo (B, P, R ou ND)", "Potenciais Patógenos (0–10 + tags de risco)", "Probióticos (0–10)", "Anti-inflamatório (0–10; 33 entradas no banco)", "Funcionalidade Nutricional: razão Firmicutes/Bacteroidetes (0–3; referência 1,1–1,8)", "Ganho de Peso (0–10)", "Produção de vitaminas (B1, B3, B5, B6, B7, B9, B12, K2 etc.)", "Perfil para Doenças (28 doenças)", "Perfis de fungos e bactérias"],
+      topics: [
+        {
+          id: "Y1", t: "Ecologia intestinal: eubiose, disbiose e o que varia entre pessoas",
+          fund: [
+            "O cólon abriga cerca de 3,8 × 10¹³ bactérias, número da mesma ordem das células humanas (Sender et al. 2016).",
+            "Filos dominantes: Bacillota (ex-Firmicutes), Bacteroidota (ex-Bacteroidetes), Actinomycetota, Pseudomonadota (ex-Proteobacteria), Verrucomicrobiota (Oren & Garrity 2021).",
+            "Gradientes ao longo do trato (O₂, pH, bile, tempo de trânsito) definem nichos; o cólon é predominantemente anaeróbio.",
+            "Composição muda com idade, dieta (fibras), medicamentos (inclusive não antibióticos — Maier et al. 2018), consistência das fezes e trânsito (Falony et al. 2016; Vandeputte et al. 2016).",
+            "'Disbiose' não tem definição operacional única; é mais útil descrever qual alteração e qual consequência (Olesen & Alm 2016).",
+          ],
+          key: ["Conceitos: resiliência, redundância funcional, alimentação cruzada (cross-feeding)", "Covariáveis: escala de Bristol, medicamentos, dieta, idade, IMC"],
+          refs: ["sender2016", "lynch2016", "fan2021", "olesen2016", "falony2016", "vandeputte2016", "maier2018", "oren2021"],
+          rel: [
+            "A Qualidade Geral considera composição, abundância, diversidade, potenciais patógenos e probióticos (modelo do relatório); no código, 0,9 × diversidade − 0,1 × patógenos + 0,1 × probióticos.",
+            "O relatório compara com o 'banco de dados interno da Conhecimento comercial Vaginal, mais representativo da população brasileira'.",
+            "O pipeline converte nomes de filos novos para os antigos (filos_novos.tsv: Bacillota → Firmicutes, Bacteroidota → Bacteroidetes etc.).",
+          ],
+          interp: [
+            "Escala 0–10 resume várias decisões de ponderação; explique ao profissional de saúde quais componentes puxaram o valor.",
+            "Coletar dados de consistência das fezes e medicamentos melhora a interpretação.",
+          ],
+          lim: [
+            "Com 90% de peso na diversidade, a Qualidade Geral é, na prática, um índice de diversidade.",
+            "Não é diagnóstico (disclaimer 1.0 do relatório) e não há, nos documentos lidos, validação contra desfechos clínicos.",
+          ],
+          ch: [
+            "Faça uma análise de sensibilidade da Qualidade Geral variando cada componente em ±1 ponto.",
+            "Pesquise se existe documentação interna de validação dos índices. Se não existir, proponha um desenho de validação (amostra, desfechos, estatística).",
+          ],
+        },
+        {
+          id: "Y2", t: "Metabolismo microbiano: fibras, ácidos graxos de cadeia curta, proteína, bile e gases",
+          fund: [
+            "Fibras fermentáveis → ácidos graxos de cadeia curta (AGCC): acetato, propionato e butirato (Koh et al. 2016).",
+            "Butirato: produzido sobretudo por Clostridia (Faecalibacterium prausnitzii, Roseburia, Agathobacter rectalis — ex-Eubacterium rectale —, Anaerostipes, Coprococcus) via butiril-CoA:acetato CoA-transferase (gene but) ou butirato quinase (buk) (Louis & Flint 2017).",
+            "Propionato: vias do succinato (Bacteroides), do acrilato e do propanodiol.",
+            "Alimentação cruzada: Bifidobacterium produz acetato e lactato, convertidos em butirato por outros gêneros.",
+            "Butirato é o principal combustível do colonócito; sua β-oxidação consome O₂ e mantém o epitélio hipóxico, o que favorece anaeróbios obrigatórios. Quando isso falha, Enterobacteriaceae facultativas proliferam (Litvak et al. 2018).",
+            "Fermentação proteolítica gera ácidos graxos de cadeia ramificada, amônia, H₂S, fenóis e indóis. Ácidos biliares são desconjugados (BSH) e 7α-desidroxilados (genes bai), formando ácidos biliares secundários.",
+            "Bilophila wadsworthia usa taurina de ácidos biliares conjugados e produz H₂S; expande com dieta rica em gordura saturada (Devkota et al. 2012). Methanobrevibacter smithii consome H₂ e produz metano, associado a trânsito lento (Triantafyllou et al. 2014).",
+          ],
+          key: ["Genes: but, buk, bsh, baiCD, mcrA (metanogênese), dsrAB (redução de sulfato)", "Táxons: F. prausnitzii, Roseburia, Agathobacter rectalis, Anaerostipes, Coprococcus, Odoribacter, Butyricimonas, Bifidobacterium, Akkermansia muciniphila, Bilophila wadsworthia, Desulfovibrio, M. smithii"],
+          refs: ["koh2016", "louis2017", "litvak2018", "devkota2012", "triantafyllou2014"],
+          rel: [
+            "O índice Anti-inflamatório inclui 'Firmicutes produtoras de butirato' = soma de Roseburia + Faecalibacterium + Eubacterium (gêneros), com referência 7–24%.",
+            "O banco_inflamatorio.json também traz Bilophila wadsworthia (< 0,7%), Desulfovibrionaceae (< 0,07%) e Methanobrevibacter smithii (< 0,001%).",
+          ],
+          interp: [
+            "Abundância de produtoras de butirato é proxy do potencial; a concentração real de AGCC depende de dieta, trânsito e absorção.",
+          ],
+          lim: [
+            "A soma usa só três gêneros. Agathobacter (onde está hoje E. rectale no GTDB), Anaerostipes e Butyricicoccus ficam de fora, e 'Eubacterium' é um gênero polifilético.",
+            "M. smithii não é pró-inflamatório por definição — está mais associado à constipação.",
+          ],
+          ch: [
+            "Liste os gêneros produtores de butirato de Louis & Flint 2017 e verifique quais aparecem no taxonomy.qza de exemplo e não entram no índice.",
+            "Escreva a fundamentação de 'por que M. smithii está no índice anti-inflamatório' — ou o argumento para retirá-lo.",
+          ],
+        },
+        {
+          id: "Y3", t: "Barreira intestinal, sistema imune e o índice Anti-inflamatório",
+          fund: [
+            "Barreira: camada de muco (mucina MUC2; camada interna quase estéril no cólon), junções de oclusão, peptídeos antimicrobianos e IgA secretora (Peterson & Artis 2014; Johansson & Hansson 2016).",
+            "Reconhecimento inato: receptores TLR e NOD detectam LPS, flagelina e peptidoglicano; desequilíbrios ativam NF-κB e citocinas inflamatórias.",
+            "Imunidade adaptativa: o butirato induz células T reguladoras (Treg) por inibição de histona desacetilases e via receptores GPR43/GPR109A (Smith et al. 2013; Furusawa et al. 2013). O polissacarídeo A de Bacteroides fragilis estimula IL-10 e protege de colite em modelos (Mazmanian et al. 2008).",
+            "F. prausnitzii tem efeito anti-inflamatório em modelos e está reduzida em doença de Crohn (Sokol et al. 2008). Akkermansia muciniphila degrada mucina; sua proteína Amuc_1100 melhorou o metabolismo em camundongos (Plovier et al. 2017).",
+            "Pró-inflamatórios: o glucorramnano de Ruminococcus gnavus induz TNF-α (Henke et al. 2019); expansão de Proteobacteria é marcador frequente de disbiose (Shin et al. 2015); Fusobacterium nucleatum está associado a câncer colorretal (Kostic et al. 2013).",
+            "Inflamação intestinal na clínica é medida por calprotectina fecal, não por composição microbiana.",
+          ],
+          key: ["Moléculas: MUC2, IgA, LPS, flagelina, butirato, IL-10, IL-17, IL-22, TNF-α, calprotectina", "Táxons do banco: limite superior — B. vulgatus, B. caccae, Prevotella, Escherichia, Proteobacteria, Desulfovibrionaceae, Parasutterella, Bilophila, R. gnavus, Parabacteroides, B. ovatus, Fusobacteria, M. smithii, Collinsella aerofaciens, Paraprevotella, Enterobacteriaceae, B. fragilis; limite inferior — F. prausnitzii, Roseburia, C. butyricum, Bifidobacterium, E. rectale, Oscillospira, A. muciniphila, Lactobacillus, Odoribacter, Coprococcus, Blautia, Butyricimonas, Butyrivibrio"],
+          refs: ["belkaid2014", "peterson2014", "johansson2016", "smith2013", "furusawa2013", "sokol2008", "mazmanian2008", "plovier2017", "henke2019", "shin2015", "kostic2013"],
+          rel: [
+            "O modelo do relatório diz que o índice usa '36 marcadores microbiológicos inflamatórios e anti-inflamatórios'. O banco_inflamatorio.json tem 33 entradas: 17 táxons com limite superior, 13 com limite inferior e 3 indicadores compostos (F/B, patógenos obrigatórios e produtoras de butirato).",
+            "Cálculo (src/IndiceInflamatorio.py): cada marcador recebe peso entre −5 e +1,5 conforme a distância das faixas; a soma é limitada a 0–10. Abaixo de 4 = 'perfil observado em indivíduos com inflamação intestinal'.",
+            "Não encontrei um índice 'imunológico' separado no modelo atual; o Anti-inflamatório cumpre esse papel.",
+          ],
+          interp: [
+            "Leia o índice como 'semelhança com perfis definidos pelas faixas do banco', não como medida de inflamação.",
+            "Antes de explicar um valor, veja quais marcadores contribuíram e se são confiáveis no nível taxonômico usado.",
+          ],
+          lim: [
+            "Atribuição de espécie de Bacteroides por 16S é incerta, e efeitos são de cepa: B. fragilis enterotoxigênica (gene bft) é pró-inflamatória; a não toxigênica produz PSA protetor.",
+            "Prevotella > 0,1% é penalizada, mas o enterotipo P exige 20–60% — pessoas com dieta rica em fibras e enterotipo P perdem pontos sistematicamente.",
+            "Pontos a verificar no código: táxons benéficos ausentes que somam +1,5, faixa que retorna None e nomes do banco que podem não corresponder à taxonomia GTDB.",
+          ],
+          ch: [
+            "Para cada um dos 33 marcadores, escreva: direção, mecanismo proposto, referência e nível de evidência (associação, modelo animal, intervenção humana).",
+            "Escreva um teste unitário para calcular_score com abundância 0 de E. rectale e mostre o efeito no índice.",
+            "Proponha um estudo de validação: correlação do índice com calprotectina fecal, tamanho amostral e análise estatística.",
+          ],
+        },
+        {
+          id: "Y4", t: "Índices funcionais: F/B, ganho de peso, vitaminas e enterotipos",
+          fund: [
+            "Razão Firmicutes/Bacteroidetes: associada à obesidade em estudos iniciais (Ley et al. 2006), mas meta-análises não confirmaram associação consistente em humanos (Walters et al. 2014; Magne et al. 2020).",
+            "Enterotipos: agrupamentos dominados por Bacteroides, Prevotella ou Ruminococcus (Arumugam et al. 2011). Trabalhos posteriores mostram gradientes contínuos em vez de grupos discretos; o terceiro grupo é menos robusto (Costea et al. 2018).",
+            "Vitaminas do complexo B: muitas bactérias intestinais têm vias completas ou parciais e trocam vitaminas entre si (Magnúsdóttir et al. 2015). Porém vitaminas produzidas no cólon são pouco absorvidas pelo hospedeiro — a B12, por exemplo, é absorvida no íleo, antes do cólon (LeBlanc et al. 2013).",
+            "Predição funcional a partir de 16S (PICRUSt2) estima genes por parentesco filogenético; precisão varia por categoria (Douglas et al. 2020; Sun et al. 2020).",
+          ],
+          key: ["Genes/EC usados no pipeline: listas de EC numbers por vitamina (ex.: biotina 2.1.1.197, 6.2.1.14, 2.6.1.62, 6.3.3.3, 2.8.1.6)", "Conceitos: DMM (Dirichlet multinomial mixture), predição filogenética"],
+          refs: ["ley2006", "walters2014", "magne2020", "arumugam2011", "costea2018", "magnusdottir2015", "leblanc2013", "picrust2", "sun2020"],
+          rel: [
+            "Funcionalidade Nutricional (F/B): escala 0–3, referência 1,1–1,8 no relatório e no banco_inflamatorio.json; valores_referencia.json usa 1,0–1,8 (divergência).",
+            "O texto do modelo afirma que Firmicutes convertem fibras em carboidratos 'estocados como glicogênio e convertidos em gordura' e que Bacteroidetes 'metabolizam gorduras' — simplificações sem suporte direto na literatura citada acima.",
+            "Enterotipo (src/Enterotipo.py): Bacteroides + Phocaeicola entre 35% e 75%, Prevotella entre 20% e 60%, Ruminococcus entre 15% e 20%.",
+            "Vitaminas (src/IndiceVitaminas.py): soma de abundâncias relativas de EC preditos pelo PICRUSt2 × multiplicadores (10, 20 ou 30).",
+          ],
+          interp: [
+            "Índice de vitamina = potencial genético predito da comunidade em escala arbitrária; o próprio relatório recomenda dosagem sérica.",
+            "Enterotipo = descrição da composição dominante, não categoria clínica (disclaimer 1.1).",
+          ],
+          lim: [
+            "F/B depende do método (extração, região do 16S, banco de referência) e da classificação de filos.",
+            "Multiplicadores das vitaminas não têm fundamentação bibliográfica documentada nos arquivos lidos.",
+          ],
+          ch: [
+            "Reescreva o texto da Funcionalidade Nutricional com base em Magne et al. 2020 e Walters et al. 2014.",
+            "Escolha uma vitamina e rastreie cada EC da lista até a enzima e a etapa da via (KEGG/MetaCyc). A lista cobre a via inteira?",
+            "Compare predições PICRUSt2 com metagenômica shotgun em amostras públicas (curatedMetagenomicData) para uma vitamina.",
+          ],
+        },
+        {
+          id: "Y5", t: "Patógenos, probióticos e o 'Perfil para Doenças'",
+          fund: [
+            "Patógeno ≠ patobionte ≠ portador assintomático: presença de DNA não indica infecção.",
+            "Limites do 16S para patógenos: Shigella × E. coli; B. anthracis × B. cereus; complexo M. tuberculosis × outras micobactérias; espécies de Brucella; Treponema pallidum × Treponema comensais; Neisseria patogênicas × comensais.",
+            "Probiótico = microrganismo vivo que, administrado em quantidade adequada, confere benefício ao hospedeiro; efeitos são específicos de cepa (Hill et al. 2014).",
+            "O gênero Lactobacillus foi dividido em 25 gêneros em 2020 (ex.: L. casei → Lacticaseibacillus casei; L. plantarum → Lactiplantibacillus plantarum) (Zheng et al. 2020).",
+            "Associações microbioma–doença: muitas são inespecíficas, compartilhadas por várias doenças (Duvallet et al. 2017); medicamentos confundem (metformina — Forslund et al. 2015); causalidade reversa é comum.",
+          ],
+          key: ["Lista de potenciais patógenos do relatório (~58 espécies, ex.: C. difficile, H. pylori, K. pneumoniae, F. nucleatum, P. gingivalis)", "Probióticos: Bifidobacterium, Lactobacillus (sensu lato), Bacillus coagulans, B. subtilis, Enterococcus faecium etc."],
+          refs: ["hill2014", "zheng2020", "duvallet2017", "forslund2015", "johnson2019"],
+          rel: [
+            "Potenciais Patógenos: escala 0–10 + tags (normal na população; seguir dieta; consultar médico) por espécie.",
+            "Probióticos: considera espécies registradas como probióticos humanos (o modelo cita a RDC ANVISA 718/2022 — confira a norma vigente).",
+            "Perfil para Doenças: 28 doenças (ex.: Crohn, retocolite, SII, diabetes 1 e 2, Parkinson, autismo, depressão) com risco baixo → alto, baseado em banco_doencas.json e TAGS_doencas.tsv.",
+            "O índice Anti-inflamatório penaliza qualquer presença de 'patógenos obrigatórios' — lista que inclui o gênero Escherichia, S. epidermidis e E. faecalis, frequentes em pessoas saudáveis.",
+          ],
+          interp: [
+            "Use 'detectado DNA de...' em vez de 'presença de patógeno'. Tags de risco não equivalem a UFC (disclaimer 1.2).",
+            "Táxon probiótico detectado ≠ efeito probiótico (disclaimer 1.3).",
+          ],
+          lim: [
+            "'Risco' sugere predição individual; os dados são associações transversais de estudos populacionais, sem validação preditiva no indivíduo.",
+            "Nomes antigos de Lactobacillus podem não corresponder aos nomes da taxonomia de referência.",
+          ],
+          ch: [
+            "Para 3 doenças do banco_doencas.json, rastreie cada táxon até o artigo de origem e classifique o desenho do estudo (caso-controle, coorte, intervenção).",
+            "Escreva a explicação de um resultado 'risco aumentado para doença de Crohn' para um nutricionista, sem fazer alegação diagnóstica.",
+            "Marque, na lista de patógenos, os que não podem ser confirmados por 16S e proponha o teste confirmatório de cada um.",
+          ],
+        },
+      ],
+    },
+    // =============================================================
+    {
+      id: "solos", name: "Solos — microbioma do solo", brand: "Solos", report: "Relatório Solos (exemplo de entrega) + bancos Solos",
+      indicators: ["Risco de doenças (17 doenças/agentes): supressividade × agravantes → baixo/médio/alto", "Microrganismos fitopatogênicos (fungos, bactérias, nematoides*)", "Benéficos: fixadores de N, solubilizadores, sideróforos, micorrízicos, promotores de crescimento, fitormônios", "Biocontroladores por alvo e classe de ação", "Biodiversidade: Gini-Simpson, Chao1, Shannon, Pielou e índice global", "Perfil microbiológico (filos e espécies)", "Histórico: índices funcionais de carbono e fósforo (PICRUSt2)"],
+      topics: [
+        {
+          id: "S1", t: "O solo como habitat: estrutura, rizosfera e montagem do microbioma",
+          fund: [
+            "O solo é um mosaico de microambientes (agregados, poros com água ou ar, gradientes de O₂ e nutrientes) — milímetros separam condições muito diferentes.",
+            "O pH é o principal preditor da composição bacteriana em escala continental (Fierer & Jackson 2006); fungos respondem mais a vegetação, matéria orgânica e clima (Tedersoo et al. 2014).",
+            "Efeito rizosfera: exsudatos radiculares (açúcares, ácidos orgânicos, aminoácidos, metabólitos secundários) selecionam a comunidade; a planta 'recruta' parte do microbioma, inclusive sob ataque de patógenos (Philippot et al. 2013; Berendsen et al. 2012).",
+            "Compartimentos: solo não rizosférico → rizosfera → rizoplano → endosfera, com filtragem crescente.",
+            "Grande parte da diversidade do solo não é cultivada nem descrita (Fierer 2017).",
+          ],
+          key: ["Filos típicos: Acidobacteriota, Actinomycetota, Pseudomonadota, Chloroflexota, Verrucomicrobiota; fungos Ascomycota, Basidiomycota, Mortierellomycota, Glomeromycota", "Variáveis: pH, matéria orgânica, textura, umidade, manejo"],
+          refs: ["fierer2017", "fiererJackson2006", "philippot2013", "berendsen2012", "tedersoo2014", "bardgett2014"],
+          rel: [
+            "O Solos usa 250 mg de solo homogeneizado para extração de DNA e apresenta filos e espécies mais abundantes, explicando 'indet.' e 'não-cultivado'.",
+            "O histórico de índices armazena matéria orgânica (g/dm³) e pH (CaCl₂) junto com os índices — base para interpretar com dados químicos.",
+          ],
+          interp: [
+            "Interprete o perfil junto com pH, matéria orgânica, cultura, manejo e época de coleta.",
+          ],
+          lim: [
+            "250 mg representam bem uma amostra composta homogênea, não a variabilidade do talhão; o desenho amostral (pontos, profundidade, rizosfera vs. solo não rizosférico) define o que se pode concluir.",
+          ],
+          ch: [
+            "Escreva um protocolo de amostragem recomendado ao cliente (nº de subamostras, profundidade, época, transporte).",
+            "Explique por que duas coletas do mesmo talhão podem dar perfis diferentes.",
+          ],
+        },
+        {
+          id: "S2", t: "Ciclagem de nutrientes: carbono, nitrogênio e fósforo",
+          fund: [
+            "Carbono: decomposição por celulases, β-glicosidases, ligninases (fungos); formação de matéria orgânica estável a partir de necromassa microbiana; respiração libera CO₂; metanogênese em anaerobiose.",
+            "Nitrogênio: fixação (nif), mineralização/amonificação, nitrificação (amoA de arqueias AOA e bactérias AOB; comammox), desnitrificação (narG, nirK/nirS, norB, nosZ — a falta de nosZ aumenta emissão de N₂O), DNRA e anammox (Kuypers et al. 2018).",
+            "Fósforo: mineralização (fosfatases, fitases), solubilização (ácidos orgânicos), imobilização na biomassa e síntese de polifosfatos.",
+            "Polissacarídeos extracelulares (EPS) e hifas fúngicas estabilizam agregados.",
+            "Indicadores biológicos de solo usados no Brasil incluem atividade enzimática (β-glicosidase e arilsulfatase, como na tecnologia BioAS da Embrapa).",
+          ],
+          key: ["Genes: amoA, nxrB, narG, nirK, nirS, norB, nosZ, nifH, phoD, appA", "Enzimas: β-glicosidase, arilsulfatase, fosfatase ácida, urease"],
+          refs: ["kuypers2018", "richardson2011", "fierer2017"],
+          rel: [
+            "O histórico de índices Solos (2024) inclui índices funcionais de carbono (fixação de carbono, biomassa, biossíntese de polissacarídeos, EPS, glicosidases, fermentação, metanogênese, respiração) e de fósforo (acidificação, EPS, mineralização, imobilização, citocromo c oxidase, fitase, síntese de polifosfatos), calculados de funções preditas pelo PICRUSt2.",
+            "Esses índices não aparecem no relatório de entrega analisado — confirme se foram descontinuados.",
+          ],
+          interp: [
+            "Índice funcional predito indica potencial relativo da comunidade, não taxa de processo.",
+          ],
+          lim: [
+            "Taxas de processo exigem medidas diretas (respiração, atividade enzimática, fluxo de N₂O, P disponível).",
+          ],
+          ch: [
+            "Para o índice de fósforo do histórico, liste quais genes/EC compõem cada componente e avalie se faz sentido biológico.",
+            "Proponha como validar um índice funcional predito com análises químicas e enzimáticas do mesmo solo.",
+          ],
+        },
+        {
+          id: "S3", t: "Supressividade e o índice de risco de doenças",
+          fund: [
+            "Triângulo da doença: hospedeiro suscetível + patógeno virulento + ambiente favorável. Presença do patógeno é necessária, não suficiente.",
+            "Supressividade geral: proporcional à biomassa e atividade microbiana total, não transferível. Supressividade específica: atribuída a grupos definidos, transferível com pequenas quantidades de solo (Weller et al. 2002; Schlatter et al. 2017).",
+            "Exemplo clássico: declínio do mal-do-pé (Gaeumannomyces) em monocultura de trigo por Pseudomonas produtoras de 2,4-diacetilfloroglucinol. Outro: solos supressivos a Rhizoctonia com Pseudomonadaceae e outras bactérias (Mendes et al. 2011).",
+            "Densidade de inóculo e nível de dano variam por patossistema.",
+          ],
+          key: ["Doenças avaliadas no Solos: mancha de Bipolaris, oídio (Blumeria), podridão parda da haste (Cadophora/Phialophora), antracnose (Colletotrichum), mancha-alvo (Corynespora), cancro da haste (Diaporthe), helmintosporiose (Exserohilum), fusariose (Fusarium), mal-do-pé (Gaeumannomyces), giberela (Gibberella), nematoides (Helicotylenchus, Heterodera, Meloidogyne, Pratylenchus), podridão cinzenta (Macrophomina), rizoctoniose (Thanatephorus), murcha de Verticillium", "Biocontroles comerciais citados: Bacillus, Trichoderma, Streptomyces, Pseudomonas, Paenibacillus, Epicoccum, Clonostachys rosea"],
+          refs: ["weller2002", "schlatter2017", "mendes2011", "berendsen2012"],
+          rel: [
+            "Conforme o relatório Solos, o índice combina supressividade (biodiversidade, benéficos, biocontrole comercial e biocontrole conservativo) contra agravantes (abundância do patógeno causador e de outros patógenos), resultando em risco baixo, médio ou alto por doença.",
+            "O banco de risco registra peso do causador, abundâncias do causador, sinônimos e outros patógenos, e contagens de gêneros de biocontrole (banco_de_dados_historico_indices_risco_de_doencas.tsv).",
+            "O relatório afirma que a identificação não é diagnóstico fitopatológico e que ITS não é recomendado para nematoides (alto risco de falso negativo).",
+          ],
+          interp: [
+            "Risco 'alto' = combinação desfavorável de sinais na comunidade, a ser confrontada com histórico da área, cultivar e clima.",
+            "Para fusariose, 'Fusarium sp.' inclui muitas espécies saprófitas; formae speciales de F. oxysporum não são resolvidas por ITS (confirmação por TEF1α ou marcadores específicos).",
+          ],
+          lim: [
+            "Pesos do índice são definidos por especialistas; validação contra incidência de doença em campo não aparece nos documentos lidos.",
+            "Biodiversidade contribui sobretudo para supressividade geral; supressividade específica depende de grupos funcionais definidos.",
+          ],
+          ch: [
+            "Reproduza, a partir do banco de risco, o cálculo do índice de uma doença para uma amostra e explique cada termo.",
+            "Proponha um estudo para validar o índice de fusariose com dados de incidência em talhões.",
+            "Conecte o mal-do-pé do relatório (Pseudomonas fluorescens como biocontrole) à literatura do 2,4-DAPG.",
+          ],
+        },
+        {
+          id: "S4", t: "Micorrizas e grupos funcionais benéficos no solo",
+          fund: [
+            "Fungos micorrízicos arbusculares (Glomeromycota) formam arbúsculos nas células corticais; trocam fosfato e água por carbono da planta — inclusive lipídios, já que esses fungos não sintetizam ácidos graxos (Parniske 2008; Jiang et al. 2017).",
+            "Ectomicorrizas (ex.: Pisolithus, Hebeloma) associam-se principalmente a árvores (eucalipto, pinus), não a grãos.",
+            "Redes micorrízicas comuns entre plantas são populares na divulgação, mas a evidência de transferência de recursos com efeito ecológico é fraca (Karst et al. 2023).",
+            "A glomalina é frequentemente citada como estruturadora de agregados; o método usado para medir 'proteína do solo relacionada à glomalina' não é específico de fungos micorrízicos.",
+          ],
+          key: ["Gêneros AMF no banco Solos: Glomus (62), Acaulospora (58), Rhizophagus (24), Diversispora (22), Scutellospora, Septoglomus, Funneliformis, Gigaspora", "Ectomicorrízicos no banco: Pisolithus, Hebeloma, Cenococcum"],
+          refs: ["parniske2008", "jiang2017", "karst2023", "tedersoo2014", "nilsson2019"],
+          rel: [
+            "Solos e Bioinsumo reportam fungos micorrízicos; o Bioinsumo cita glomalina na estruturação do solo.",
+            "No banco de jun/2026 há 410 espécies micorrízicas e apenas 2 com referência preenchida.",
+          ],
+          interp: [
+            "Primers de ITS têm baixa eficiência para Glomeromycota; poucas leituras de AMF podem ser artefato do método, não ausência biológica.",
+            "Ectomicorrízicos detectados num talhão de soja podem vir de árvores próximas ou de DNA transportado.",
+          ],
+          lim: [
+            "Para quantificar AMF, primers de SSU/18S ou LSU específicos e colonização radicular (microscopia) são mais adequados.",
+          ],
+          ch: [
+            "Escreva uma nota técnica: 'Por que o ITS subestima fungos micorrízicos arbusculares e como interpretar o resultado'.",
+            "Revise a frase sobre glomalina no Bioinsumo à luz da literatura.",
+          ],
+        },
+        {
+          id: "S5", t: "Biodiversidade, saúde do solo e multifuncionalidade",
+          fund: [
+            "Diversidade microbiana sustenta múltiplas funções simultâneas (multifuncionalidade); perdas de diversidade reduzem funções raras mais do que funções amplamente distribuídas (Wagg et al. 2014; Delgado-Baquerizo et al. 2016).",
+            "Redundância funcional explica por que muitas funções comuns se mantêm mesmo com mudanças de composição.",
+            "Saúde do solo integra indicadores químicos, físicos e biológicos; não existe um único 'índice de microbioma' validado universalmente.",
+          ],
+          key: ["Conceitos: resiliência, resistência, redundância funcional, solo conducivo vs. supressivo"],
+          refs: ["wagg2014", "delgado2016", "bardgett2014", "schlatter2017"],
+          rel: [
+            "O Solos diz que solos diversos tendem a manter funcionalidade após mudanças ambientais e que 'nesta condição, pode-se dizer que o solo torna-se supressivo'; manejo degradante tornaria o solo 'conducivo'.",
+            "O índice global de biodiversidade resume os quatro índices normalizados pelo histórico.",
+          ],
+          interp: [
+            "Alta diversidade favorece supressividade geral, mas não garante supressão de um patógeno específico.",
+          ],
+          lim: [
+            "A frase 'torna-se supressivo' generaliza além da evidência — supressividade é definida pela doença, não pela diversidade.",
+          ],
+          ch: [
+            "Reescreva o parágrafo de biodiversidade do Solos com a distinção entre supressividade geral e específica.",
+            "Compare o índice global Solos com indicadores enzimáticos (BioAS) em um conjunto de amostras com os dois dados.",
+          ],
+        },
+      ],
+    },
+    // =============================================================
+    {
+      id: "genoma", name: "Relatório de Genoma de microrganismo", brand: "Conhecimento comercial", report: "Relatorio_Genoma_Roxo.pdf + relatório de exemplo (GG-FO062-02 – V1)",
+      indicators: ["Estatísticas de montagem: nº de contigs (>500 pb), tamanho, nº de reads, bases, cobertura média", "Taxonomia por ANI (Skani) e clustermap", "Solubilização: ácidos orgânicos (acético, glucônico, lático, málico, oxálico) e transporte/assimilação de fosfato", "Fitormônios: auxinas, jasmonato, giberelinas, ácido salicílico, degradação de etileno, ácido abscísico", "Enzimas: proteases, quitinases, glucanases", "Metabólitos secundários (antiSMASH): sideróforos, terpenos, antibacterianos, fungicidas, surfactantes, herbicidas, inseticidas, toxinas, outros", "Metabolismo de N: fixação biológica, nitrato, nitrito, NO", "Fatores de virulência do gênero (ex.: Bacillus)"],
+      topics: [
+        {
+          id: "G1", t: "Montagem, qualidade e identificação de espécie por ANI",
+          fund: [
+            "Montagem de novo de reads curtas com SPAdes (grafos de de Bruijn multi-k) gera contigs; repetições (operons de rRNA, transposases) fragmentam a montagem (Bankevich et al. 2012).",
+            "Métricas: nº de contigs, N50, tamanho total, cobertura; completude e contaminação por genes marcadores de cópia única (CheckM — Parks et al. 2015).",
+            "Espécie procariótica por genoma: ANI ≥ 95–96% com a linhagem-tipo (Richter & Rosselló-Móra 2009; Jain et al. 2018). Skani calcula ANI rápido mesmo com genomas fragmentados (Shaw & Yu 2023). GTDB-Tk classifica pela taxonomia GTDB.",
+            "Nomenclatura muda: B. velezensis separada de B. amyloliquefaciens (Dunlap et al. 2016); espécies movidas para Priestia e outros gêneros (Gupta et al. 2020).",
+          ],
+          key: ["Ferramentas do relatório: FastQC 0.11.9, fastp 1.1.0 (Trimmomatic 0.40 no modelo antigo), SPAdes 4.2.0, Prokka 1.14.6, Skani 0.2.1, METABOLIC 4.0, DIAMOND 2.1.16, antiSMASH 8.0.4", "Complementares: CheckM/CheckM2, GTDB-Tk, QUAST"],
+          refs: ["spades2012", "checkm", "richter2009", "jain2018", "skani", "gtdbtk", "dunlap2016", "gupta2020"],
+          rel: [
+            "O relatório de exemplo traz 70 contigs (>500 pb), 3,91 Mb e cobertura média ~455×; ANI de 98,21% com B. velezensis NRRL B-41580, acima do limiar de 95%. O isolado foi enviado como 'Bacillus subtilis'.",
+            "O modelo 'Roxo' identifica Novacetimonas hansenii (ex-Komagataeibacter/Gluconacetobacter hansenii) com 98,9% de ANI.",
+            "Divergência no modelo 'Roxo': a metodologia cita Skani, mas o texto da taxonomia menciona fastANI; IDs da tabela de taxonomia diferem da tabela de montagem.",
+          ],
+          interp: [
+            "ANI ≥ 95% com a referência = mesma espécie; para identidade de cepa use SNPs/cgMLST contra a cepa declarada.",
+            "Cobertura muito alta não melhora a montagem (pode até piorar com SPAdes); subamostragem para ~100× é prática comum.",
+          ],
+          lim: [
+            "O relatório não informa completude/contaminação (CheckM) — recomendável incluir, pois contaminação de cultura altera ANI e anotação.",
+            "Resultado depende do banco de referências comparado.",
+          ],
+          ch: [
+            "Reproduza a identificação com skani ou fastANI usando genomas públicos de B. velezensis, B. amyloliquefaciens e B. subtilis; monte o clustermap.",
+            "Escreva o parágrafo para o cliente explicando por que seu 'B. subtilis' é B. velezensis e o que isso significa para registro e marketing do produto.",
+          ],
+        },
+        {
+          id: "G2", t: "Anotação funcional e reconstrução metabólica (N, P, fitormônios, enzimas)",
+          fund: [
+            "Predição de genes (Prodigal), anotação por homologia (Prokka usa bancos curados e HMMs; parte das proteínas fica 'hypothetical protein') (Seemann 2014).",
+            "Reconstrução de vias: completude de módulos KEGG ou definições com HMMs (METABOLIC — Zhou et al. 2022); buscas de genes específicos com DIAMOND exigem limiares de identidade e cobertura (Buchfink et al. 2015).",
+            "Ortólogo ≠ parálogo: famílias grandes (proteases, transportadores) geram falsos positivos funcionais.",
+            "Bacillus respira nitrato em anaerobiose (narGHJI) e reduz nitrito (nasDE) — consistente com 'redução de nitrato e nitrito' sem fixação.",
+            "Secreção: proteínas extracelulares têm peptídeo sinal (Sec/Tat); só elas atuam diretamente sobre patógenos.",
+          ],
+          key: ["Genes: narGHJI, nasDE, nirBD, nifHDK, gcd, pqq, acdS, ipdC, chiA, bglS/glucanases, proteases secretadas (aprE, nprE, bpr, vpr)", "Ferramentas: Prokka, METABOLIC, DIAMOND, SignalP, MEROPS"],
+          refs: ["prokka", "metabolic", "diamond"],
+          rel: [
+            "O relatório marca vias como completa, parcial ou não identificada. No exemplo: produção de ácidos acético, málico, glucônico e lático (não oxálico); redução de nitrato e nitrito; nenhuma via de fitormônio.",
+            "Enzimas no exemplo: 171 proteases (incluindo secretadas), 2 quitinases, 2 glucanases.",
+          ],
+          interp: [
+            "171 'proteases' incluem peptidases intracelulares de manutenção; para biocontrole, interessam as secretadas.",
+            "'Via parcial' pode ser lacuna de anotação, fragmentação da montagem ou via realmente incompleta.",
+          ],
+          lim: [
+            "Genoma = potencial. Expressão e regulação exigem transcriptômica, proteômica ou ensaios.",
+          ],
+          ch: [
+            "Na tabela Prokka, classifique as proteases por família (MEROPS) e filtre as com peptídeo sinal (SignalP). Quantas restam?",
+            "Localize os genes de redução de nitrato e explique o que essa capacidade significa no solo (respiração anaeróbia, não nutrição da planta).",
+          ],
+        },
+        {
+          id: "G3", t: "Metabolismo secundário: BGCs, NRPS, PKS, RiPPs, lipopeptídeos e sideróforos",
+          fund: [
+            "Clusters de genes biossintéticos (BGCs) agrupam genes de síntese, regulação, transporte e autorresistência.",
+            "NRPS: linhas de montagem modulares; cada módulo tem domínios de adenilação (A — escolhe o aminoácido), tiolação (T/PCP) e condensação (C). A ativação dos domínios T depende de fosfopanteteinil transferase (Sfp em Bacillus) (Süssmuth & Mainz 2017).",
+            "PKS tipo I: módulos KS-AT-ACP com domínios redutores; em Bacillus predominam PKS trans-AT (bacilaeno, dificidina, macrolactina) (Fischbach & Walsh 2006).",
+            "RiPPs: peptídeos ribossomais modificados (lantipeptídeos classe II com LanM, sactipeptídeos, lassopeptídeos) (Arnison et al. 2013).",
+            "Regulação: síntese na fase estacionária, sob controle de ComA (surfactina), DegU, Spo0A e do repressor AbrB.",
+            "Moléculas do exemplo: surfactina (biossurfactante, sinalização de biofilme, ISR), fengicina (antifúngica), bacilaeno (antibacteriano), dificidina (antibacteriana), macrolactina (antibacteriana), bacilisina (antibacteriana/antifúngica), bacilibactina (sideróforo catecolato, operon dhb), lantipeptídeo classe II, ectoína (osmoprotetor), terpenos, γ-butirolactona (sinalização), T3PKS e melanina.",
+            "antiSMASH detecta BGCs por regras de domínios e compara com o MIBiG (KnownClusterBlast, % de similaridade) (Blin et al. 2023; Medema et al. 2015).",
+          ],
+          key: ["Operons: srfAA–AD, ppsA–E/fenA–E, baeB–S (pksX), dfnA–Y, mlnA–I, bacA–E, dhbACEBF, sfp", "Ferramentas: antiSMASH, MIBiG, BiG-SCAPE"],
+          refs: ["antismash7", "antismashDocs", "mibig", "fischbach2006", "sussmuth2017", "arnison2013", "stein2005", "ongena2008", "chen2009", "may2001", "fan2018", "chen2007"],
+          rel: [
+            "O relatório de exemplo identifica 14 regiões de metabólitos secundários e as classifica em sideróforos (1), terpenos (3), antibacterianos (7), fungicidas (4), surfactantes (2), toxinas (1 — macrolactina H) e outros.",
+            "A mesma molécula aparece em várias categorias (ex.: bacilibactina como antibacteriano e fungicida; bacilisina idem) — as categorias são curadoria da Conhecimento comercial, não saída direta do antiSMASH.",
+            "O item 'bacinapeptin' na tabela merece verificação do nome do BGC correspondente.",
+          ],
+          interp: [
+            "BGC presente = capacidade genética; produção depende de condição de cultivo e regulação.",
+            "Em B. velezensis, quase todas as cepas compartilham o mesmo núcleo de BGCs; diferenças entre cepas costumam estar em BGCs acessórios, expressão e colonização.",
+            "Atenção a regiões 'on contig edge': em montagem fragmentada (70 contigs), clusters podem estar incompletos.",
+          ],
+          lim: [
+            "Categorizar macrolactina H como 'toxina' precisa de justificativa bibliográfica.",
+            "Similaridade baixa com MIBiG pode indicar novidade ou simplesmente cluster incompleto.",
+          ],
+          ch: [
+            "Abra os resultados do antiSMASH do exemplo: para cada região, anote tipo, % de similaridade e se está em borda de contig.",
+            "Compare o repertório com o genoma de FZB42 (Chen et al. 2007): o que é núcleo e o que é acessório?",
+            "Desenhe a confirmação por LC-MS/MS de surfactina e fengicina no sobrenadante e o ensaio de cultura pareada correspondente.",
+          ],
+        },
+        {
+          id: "G4", t: "Segurança genômica: virulência, toxinas e resistência",
+          fund: [
+            "Grupo B. cereus: enterotoxinas Nhe (nheABC) e Hbl (hblCDAB), citotoxina K (cytK), toxina emética cereulida (cluster ces), esfingomielinase; B. anthracis: toxinas do plasmídeo pXO1 (pagA, lef, cya) e cápsula do pXO2 (capBCAD) (Ehling-Schulz et al. 2019).",
+            "Toxinas Cry/Cyt de B. thuringiensis são inseticidas (Bravo et al. 2007).",
+            "Homologia não é virulência: B. subtilis e B. velezensis produzem ácido poli-γ-glutâmico com genes pgsBCA, homólogos de capBCA — um hit isolado de 'capC' não indica cápsula de B. anthracis.",
+            "Avaliação de segurança completa inclui genes de resistência a antimicrobianos (CARD, AMRFinderPlus), elementos móveis e plasmídeos.",
+          ],
+          key: ["Bancos: VFDB, CARD", "Genes: nheABC, hblCDAB, cytK, cesA–D, pagA, lef, cya, capBCAD, pgsBCA, cry/cyt"],
+          refs: ["vfdb", "ehling2019", "bravo2007", "card"],
+          rel: [
+            "O relatório apresenta a razão genes detectados/catalogados por categoria para Bacillus (identidade e cobertura > 80%). No exemplo: toxina do antraz 0/3, Cry/Cyt 0, cápsula Cap 1/5 (capC), Has 0/3, Bps 1/9 (bpsE), Nhe 0/3, Hbl 0/4, CytK 0/1, cereulida 0/4, esfingomielinase 0/1.",
+          ],
+          interp: [
+            "Hits isolados de genes de cápsula, sem operon completo nem plasmídeo, são compatíveis com homólogos de função não patogênica.",
+          ],
+          lim: [
+            "O relatório não traz análise de resistência a antimicrobianos — relevante para dossiês de registro.",
+          ],
+          ch: [
+            "Rode AMRFinderPlus e uma busca no VFDB no genoma de exemplo e redija um parágrafo de segurança para um dossiê regulatório.",
+            "Explique por que capC detectado não indica risco de antraz.",
+          ],
+        },
+      ],
+    },
+  ],
+  integrator: {
+    title: "Referência técnica Conhecimento comercial: auditoria científica dos relatórios",
+    steps: [
+      "Escolher um relatório de cada produto (sem dados identificáveis de cliente) e anotar cada afirmação biológica com referência e nível de evidência",
+      "Levantar divergências entre relatórios, bancos e código, confirmar cada uma com a equipe responsável e propor correções de texto e código",
+      "Escrever um guia de interpretação interno por produto: o que o relatório permite e não permite concluir",
+      "Propor 2 estudos de validação (ex.: índice anti-inflamatório × calprotectina; risco de fusariose × incidência em campo) com desenho e análise",
+      "Apresentar para a equipe técnica (30 min) e registrar decisões e próximos passos",
+    ],
+  },
+};
