@@ -205,3 +205,14 @@ details summary { cursor: pointer; }
 .md-body th, .md-body td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
 .md-body th { background: var(--surface); }
 @media (max-width: 760px) { .notes-grid.mode-split { grid-template-columns: 1fr; } }
+
+/* Resumo (cheatsheet) e "Já conheço" */
+.cheat { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--border); border-left: 4px solid var(--accent-2); border-radius: 10px; background: var(--surface); }
+.cheat .cheat-body { min-height: 0; margin-top: 8px; }
+.cheat-d > summary, .cheat-topic > summary { cursor: pointer; color: var(--muted); margin-top: 6px; }
+.cheat-topic { margin: 6px 0; }
+.cheat-topic > summary strong { color: var(--text); }
+.read-topic .cheat-topic .cheat-body { min-height: 0; margin: 6px 0; }
+.known-box { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); font-size: .88rem; }
+.known-box.on { background: var(--accent-soft); color: var(--text); }
+.known-box .btn { padding: 5px 10px; font-size: .85rem; }

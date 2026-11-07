@@ -32,6 +32,7 @@
   // ---------- Plano de leitura (data/readings.js) ----------
   // Cada trecho tem uma chave estável (material + texto do trecho), usada para marcar "Lido".
   const READ = window.READINGS || {};
+  const CHEATS = window.CHEATS || {}; // resumos (cheatsheets) por tópico, gerados de data/cheatsheets/*.md
   const rKey = (mat, t) => `${mat}::${t}`;
   const short = (x, n = 110) => (x.length > n ? `${x.slice(0, n - 1).trimEnd()}…` : x);
   const READS_BY_MAT = {}; const READS_BY_TOPIC = {};
@@ -81,13 +82,13 @@
       since.push(ti); modReads.push(...TR.all);
       if (since.length === 3 && ti < m.topics.length - 1) {
         const ts = since.map((x) => m.topics[x].t);
-        push({ type: "revisao", title: "Revisão espaçada", sub: `Tópicos ${since.map((x) => x + 1).join(", ")}: ${short(ts.join("; "), 140)}`, reads: since.flatMap((x) => READS_BY_TOPIC[`${m.id}:${x}`].all), readMode: "revisao", checks: ["Revisar flashcards pendentes", ...ts.map((t) => `Refazer sem consulta um exercício de: ${t}`), "Explicar em voz alta um conceito difícil (técnica Feynman)", "Listar dúvidas restantes e buscar resposta"] });
+        push({ type: "revisao", title: "Revisão espaçada", tops: since.slice(), sub: `Tópicos ${since.map((x) => x + 1).join(", ")}: ${short(ts.join("; "), 140)}`, reads: since.flatMap((x) => READS_BY_TOPIC[`${m.id}:${x}`].all), readMode: "revisao", checks: ["Revisar flashcards pendentes", ...ts.map((t) => `Refazer sem consulta um exercício de: ${t}`), "Explicar em voz alta um conceito difícil (técnica Feynman)", "Listar dúvidas restantes e buscar resposta"] });
         since.length = 0;
       }
     });
     if (m.topics.length) {
-      push({ type: "revisao", title: "Revisão geral do módulo", sub: "Todos os tópicos do módulo", reads: modReads, readMode: "revisao", checks: ["Mapa mental do módulo inteiro sem consulta", "Revisar flashcards do módulo", "Reler os resultados esperados e marcar os que domina", "Escolher 2 pontos fracos e revisá-los"] });
-      push({ type: "avaliacao", title: "Avaliação do módulo", sub: "Sem consulta; corrigir depois com os trechos lidos", reads: modReads, readMode: "revisao", checks: [...m.quiz.map((q) => `Responder sem consulta: ${q}`), "Corrigir com os materiais e registrar a nota (≥ 70 para avançar)"] });
+      push({ type: "revisao", title: "Revisão geral do módulo", tops: m.topics.map((_, i) => i), sub: "Todos os tópicos do módulo", reads: modReads, readMode: "revisao", checks: ["Mapa mental do módulo inteiro sem consulta", "Revisar flashcards do módulo", "Reler os resultados esperados e marcar os que domina", "Escolher 2 pontos fracos e revisá-los"] });
+      push({ type: "avaliacao", title: "Avaliação do módulo", tops: m.topics.map((_, i) => i), sub: "Sem consulta; corrigir depois com os trechos lidos", reads: modReads, readMode: "revisao", checks: [...m.quiz.map((q) => `Responder sem consulta: ${q}`), "Corrigir com os materiais e registrar a nota (≥ 70 para avançar)"] });
     }
     const st = chunk(m.project.steps, m.project.sessions);
     for (let i = 0; i < m.project.sessions; i++) push({
@@ -111,7 +112,7 @@
 
   // ---------- Estado ----------
   const KEY = "trilhaBioinfo.v1";
-  const defaults = () => ({ startDate: todayISO(), days: [1, 2, 3, 4, 5], perDay: 1, parallel: 2, ggMode: "slot", off: [], done: {}, materialsSeen: {}, read: {}, checks: {}, notes: {}, scores: {}, log: [], baselineEnd: null, theme: "auto", welcomed: false });
+  const defaults = () => ({ startDate: todayISO(), days: [1, 2, 3, 4, 5], perDay: 1, parallel: 2, ggMode: "slot", off: [], done: {}, materialsSeen: {}, read: {}, checks: {}, notes: {}, known: {}, scores: {}, log: [], baselineEnd: null, theme: "auto", welcomed: false });
   let S;
   try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch { S = defaults(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { toast("Não foi possível salvar no navegador — exporte um backup."); } invalidate(); };
@@ -144,6 +145,11 @@
   }
   const isStudyDay = (d) => S.days.includes(d.getDay()) && !S.off.includes(iso(d));
   const doneOn = (dISO) => Object.entries(S.done).filter(([, d]) => d === dISO).map(([id]) => id);
+  // "Já conheço": tópico revisado só pelo resumo. S.known["MÓD:tópico"] = { d, ids } guarda as sessões concluídas por ele.
+  const knownIds = () => new Set(Object.values(S.known || {}).flatMap((r) => r.ids || []));
+  const isKnownId = (id) => !!S.done[id] && Object.values(S.known || {}).some((r) => (r.ids || []).includes(id));
+  const doneIcon = (id) => (S.done[id] ? (isKnownId(id) ? "🔁" : "✅") : "⬜");
+  const topicStudySessions = (key) => { const [mod, ti] = key.split(":"); return (BY_MOD[mod] || []).filter((s) => s.topic === +ti && (s.type === "teoria" || s.type === "pratica")); };
 
   // Distribui o que falta a partir de hoje: dia perdido = conteúdo empurrado, nada se perde.
   function plan() {
@@ -152,7 +158,8 @@
     const byDate = {}, dateOf = {};
     let d = new Date(); d.setHours(0, 0, 0, 0);
     if (parse(S.startDate) > d) d = parse(S.startDate);
-    let cap = isStudyDay(d) ? Math.max(0, S.perDay - (iso(d) === todayISO() ? doneOn(iso(d)).length : 0)) : 0;
+    const kn = knownIds();
+    let cap = isStudyDay(d) ? Math.max(0, S.perDay - (iso(d) === todayISO() ? doneOn(iso(d)).filter((id) => !kn.has(id)).length : 0)) : 0;
     let guard = 0;
     for (const s of pending) {
       while (cap <= 0 && guard++ < 20000) { d = addDays(d, 1); cap = isStudyDay(d) ? S.perDay : 0; }
@@ -213,7 +220,24 @@
   function toggleDone(id, force) {
     const on = force ?? !S.done[id];
     if (on) { S.done[id] = todayISO(); S.log.push({ d: new Date().toISOString(), a: "done", id }); }
-    else { delete S.done[id]; S.log.push({ d: new Date().toISOString(), a: "undo", id }); }
+    else {
+      delete S.done[id]; S.log.push({ d: new Date().toISOString(), a: "undo", id });
+      Object.entries(S.known).forEach(([k, r]) => { if (!(r.ids || []).includes(id)) return; r.ids = r.ids.filter((x) => x !== id); if (!r.ids.length) delete S.known[k]; });
+    }
+    save();
+  }
+  function markKnown(key) {
+    const t = todayISO(), now = new Date().toISOString();
+    const ids = topicStudySessions(key).filter((s) => !S.done[s.id]).map((s) => s.id);
+    ids.forEach((id) => { S.done[id] = t; S.log.push({ d: now, a: "done", id, k: 1 }); });
+    S.known[key] = { d: t, ids }; S.log.push({ d: now, a: "known", key });
+    save();
+  }
+  function unmarkKnown(key) {
+    const r = S.known[key]; if (!r) return;
+    const now = new Date().toISOString();
+    (r.ids || []).forEach((id) => { if (S.done[id]) { delete S.done[id]; S.log.push({ d: now, a: "undo", id }); } });
+    delete S.known[key]; S.log.push({ d: now, a: "unknown", key });
     save();
   }
   function toggleCheck(id, i) {
@@ -292,14 +316,33 @@
     return out.join("");
   }
   const NOTE_HINT = "Markdown: **negrito**, *itálico*, `código`, # Título, - lista, - [ ] tarefa, > citação, ```bloco de código```, [link](https://…), | tabela |";
-  function notesBox(id) {
-    const v = S.notes[id] || "";
+  // Botão/estado "Já conheço" de um tópico
+  function knownCtl(key, compact) {
+    const r = S.known[key];
+    if (r) return `<div class="known-box on"><span>🔁 <strong>Já conhecia</strong> — marcado em ${fmt(r.d)}${compact ? "" : `. ${r.ids.length ? `${r.ids.length} sessão(ões) de teoria/prática concluída(s) como revisão pelo resumo.` : "As sessões já estavam concluídas."}`}</span><button class="btn" data-unknown="${key}">Desfazer</button></div>`;
+    const n = topicStudySessions(key).filter((s) => !S.done[s.id]).length;
+    return `<div class="known-box"><span>${compact ? "Já domina este tópico?" : `Já domina este tópico? Revise o resumo acima e marque. ${n ? `Conclui as ${n} sessão(ões) de teoria/prática pendentes como <em>revisão</em>, sem ocupar a hora do dia, e o cronograma avança.` : "As sessões já estão concluídas; a marcação só registra que foi revisão."}`}</span><button class="btn" data-known="${key}">✓ Já conheço</button></div>`;
+  }
+  const cheatHtml = (key) => (CHEATS[key] ? md(CHEATS[key]) : `<p class="muted">Resumo ainda não disponível para este tópico.</p>`);
+  function cheatBox(s) {
+    if (s.topic != null) {
+      const key = `${s.mod}:${s.topic}`;
+      return `<div class="cheat"><div class="spread"><h4 style="margin:0">📌 Resumo do tópico <span class="small muted">(cheatsheet para revisar e saber o que esperar)</span></h4>${CHEATS[key] ? `<button class="btn" data-cheatcopy="${s.id}">Copiar para minhas anotações</button>` : ""}</div>
+        <details class="cheat-d" ${S.known[key] || S.done[s.id] ? "" : "open"}><summary class="small">Mostrar/ocultar resumo</summary><div class="md-body cheat-body">${cheatHtml(key)}</div></details>${knownCtl(key)}</div>`;
+    }
+    if (!s.tops || !s.tops.length) return "";
+    const m = MOD[s.mod];
+    return `<div class="cheat"><h4 style="margin:0 0 4px">📌 Resumos dos tópicos desta ${s.type === "avaliacao" ? "avaliação" : "revisão"}</h4>${s.type === "avaliacao" ? `<p class="small muted" style="margin:0 0 6px">Responda primeiro sem consulta; abra os resumos só na correção.</p>` : ""}
+      ${s.tops.map((ti) => { const key = `${s.mod}:${ti}`; return `<details class="cheat-topic"><summary><strong>Tópico ${ti + 1} · ${esc(m.topics[ti].t)}</strong>${S.known[key] ? ` <span class="pill">🔁 já conhecia</span>` : ""}</summary><div class="md-body cheat-body">${cheatHtml(key)}</div></details>`; }).join("")}</div>`;
+  }
+  function notesBox(s) {
+    const id = s.id, v = S.notes[id] || "";
     return `<div class="notes"><div class="spread"><h3 style="margin:0">Anotações</h3><div class="seg" role="tablist">
         ${[["edit", "Escrever"], ["split", "Lado a lado"], ["view", "Visualizar"]].map(([k, l]) => `<button class="seg-btn" data-notemode="${k}" aria-pressed="${(S.noteMode || "split") === k}">${l}</button>`).join("")}</div></div>
       <div class="notes-grid mode-${S.noteMode || "split"}">
         <textarea data-note="${id}" spellcheck="true" placeholder="Dúvidas, insights, links, comandos... (aceita Markdown)">${esc(v)}</textarea>
         <div class="md-body" data-note-preview="${id}">${v.trim() ? md(v) : `<p class="muted">A pré-visualização aparece aqui.</p>`}</div>
-      </div><div class="small muted" style="margin-top:4px">${esc(NOTE_HINT)}</div></div>`;
+      </div><div class="small muted" style="margin-top:4px">${esc(NOTE_HINT)}</div>${s.type === "projeto" ? "" : cheatBox(s)}</div>`;
   }
   // Um trecho de leitura com checkbox "Lido" (compartilhado em todas as telas onde o mesmo trecho aparece)
   function readItem(r, opts = {}) {
@@ -327,7 +370,8 @@
   }
   function sessionCard(s, opts = {}) {
     const done = !!S.done[s.id], m = MOD[s.mod], ch = new Set(S.checks[s.id] || []);
-    const date = done ? `concluída em ${fmt(S.done[s.id])}` : plan().dateOf[s.id] ? `prevista para ${fmt(plan().dateOf[s.id])}` : "";
+    const kn = isKnownId(s.id);
+    const date = done ? `${kn ? "🔁 já conhecia · revisada" : "concluída"} em ${fmt(S.done[s.id])}` : plan().dateOf[s.id] ? `prevista para ${fmt(plan().dateOf[s.id])}` : "";
     return `<div class="session ${done ? "done" : ""}">
       <div class="spread"><div class="meta">${typeTag(s.type)} ${areaDot(m.area)} <a href="#/modulo/${m.id}">${esc(m.name)}</a> · sessão ${s.n}/${BY_MOD[m.id].length}</div><span class="small muted">${date}</span></div>
       <h3 style="margin:8px 0 4px"><a href="#/sessao/${s.id}" style="color:inherit">${sTitle(s)}</a></h3>${sSub(s)}
@@ -344,6 +388,7 @@
 
   pages[""] = () => {
     const P = plan(), total = SESS.length, done = Object.keys(S.done).filter((k) => SID[k]).length;
+    const kDone = [...knownIds()].filter((k) => SID[k] && S.done[k]).length;
     const wk = weekStats(weekRange()), miss = missedDays().length, base = S.baselineEnd || baselineEnd();
     const delay = P.end ? Math.round((parse(P.end) - parse(base)) / 864e5) : 0;
     const next = P.pending[0];
@@ -354,7 +399,7 @@
     ${S.welcomed ? "" : `<div class="banner stack" style="margin-bottom:16px"><div><strong>Bem-vinda à sua trilha!</strong> São ${ORDER.length} módulos e ${total} sessões de 1 hora, com dependências entre assuntos. O cronograma começa em ${fmt(S.startDate)} com estudo de ${S.days.map((d) => DOW[d]).join(", ")}. Ajuste dias e data de início em <a href="#/config">Configurações</a>.</div><div class="small muted">O progresso fica salvo neste navegador. Faça backups periódicos (Configurações → Exportar).</div><div><button class="btn primary" data-act="welcome">Entendi, vamos começar</button></div></div>`}
     <div class="page-head"><h1>Dashboard</h1><div class="muted">${fmtLong(todayISO())}</div></div>
     <div class="grid g4">
-      <div class="card kpi"><div class="v">${done}<span class="muted" style="font-size:1rem">/${total}</span></div><div class="l">sessões concluídas (${done} h de estudo)</div></div>
+      <div class="card kpi"><div class="v">${done}<span class="muted" style="font-size:1rem">/${total}</span></div><div class="l">sessões concluídas (${done - kDone} h de estudo${kDone ? ` + ${kDone} revisada(s) por “já conheço”` : ""})</div></div>
       <div class="card kpi"><div class="v">${streak()} 🔥</div><div class="l">dias seguidos de estudo</div></div>
       <div class="card kpi"><div class="v">${wk.done}/${wk.total}</div><div class="l">sessões nesta semana</div>${bar(pct(wk.done, wk.total))}</div>
       <div class="card kpi"><div class="v" style="font-size:1.25rem">${P.end ? fmt(P.end) : "Concluído!"}</div><div class="l">previsão de término ${delay > 0 ? `· <span style="color:var(--warn)">+${delay} dias vs plano</span>` : delay < 0 ? `· <span style="color:var(--ok)">${-delay} dias adiantada</span>` : "· no plano"}</div></div>
@@ -379,7 +424,7 @@
 
   pages.hoje = () => {
     const P = plan(), t = todayISO();
-    const ids = [...doneOn(t), ...(P.byDate[t] || [])];
+    const kn = knownIds(), ids = [...doneOn(t).filter((id) => !kn.has(id)), ...(P.byDate[t] || [])];
     const study = isStudyDay(parse(t));
     const nextDay = Object.keys(P.byDate).find((d) => d > t);
     return `<div class="page-head spread"><div><h1>Hoje</h1><div class="muted">${fmtLong(t)}</div></div>
@@ -401,7 +446,7 @@
       <div><h3>Checklist</h3>${checklist(s)}</div>
       ${s.type === "avaliacao" ? `<div class="row"><label for="sc-${s.id}"><strong>Nota da autoavaliação (0–100):</strong></label><input type="number" min="0" max="100" id="sc-${s.id}" data-score="${s.id}" value="${S.scores[s.id] ?? ""}" style="width:90px">${S.scores[s.id] != null && S.scores[s.id] < 70 ? `<span class="small" style="color:var(--warn)">Abaixo de 70: revise os tópicos fracos antes de avançar.</span>` : ""}</div>` : ""}
       ${reads.length ? `<details ${s.readMode !== "revisao" ? "open" : ""}><summary><strong>${readTitle}</strong> <span class="read-prog ${rd === reads.length ? "full" : ""}">${rd}/${reads.length} lido(s)</span></summary><p class="small muted" style="margin:6px 0">${readHint}</p>${reads.map((r) => readItem(r, { where: s.readMode === "leitura" ? "" : readWhere(ownerOf(r)) })).join("")}</details>` : ""}
-      ${notesBox(s.id)}
+      ${notesBox(s)}
       <div class="spread"><div class="row">${prev ? `<a class="btn" href="#/sessao/${prev.id}">← Anterior</a>` : ""}${next ? `<a class="btn" href="#/sessao/${next.id}">Próxima →</a>` : ""}</div>
       <button class="btn ${done ? "" : "primary"}" data-done="${s.id}">${done ? "Desfazer conclusão" : "✓ Marcar sessão como concluída"}</button></div>
     </div>`;
@@ -423,8 +468,9 @@
     const readPlan = m.topics.map((tp, ti) => {
       const TR = READS_BY_TOPIC[`${id}:${ti}`], d = readDone(TR.all);
       const thS = BY_MOD[id].filter((s) => s.topic === ti && s.readMode === "leitura");
-      return `<details class="read-topic" ${ti === firstOpen ? "open" : ""}><summary><strong>Tópico ${ti + 1} · ${esc(tp.t)}</strong> <span class="read-prog ${d === TR.all.length ? "full" : ""}">${d}/${TR.all.length}</span></summary>
-        ${thS.map((s) => `<div class="read-session"><a href="#/sessao/${s.id}">${S.done[s.id] ? "✅" : "⬜"} ${TYPE[s.type].label}${s.part ? ` ${s.part}` : ""}</a>${s.sub ? ` <span class="small muted">— ${esc(short(s.sub, 90))}</span>` : ""}</div>${s.reads.map((r) => readItem(r)).join("")}`).join("")}</details>`;
+      return `<details class="read-topic" ${ti === firstOpen ? "open" : ""}><summary><strong>Tópico ${ti + 1} · ${esc(tp.t)}</strong> <span class="read-prog ${d === TR.all.length ? "full" : ""}">${d}/${TR.all.length}</span>${S.known[`${id}:${ti}`] ? ` <span class="pill">🔁 já conhecia</span>` : ""}</summary>
+        <details class="cheat-topic"><summary class="small">📌 Resumo do tópico</summary><div class="md-body cheat-body">${cheatHtml(`${id}:${ti}`)}</div></details>${knownCtl(`${id}:${ti}`, true)}
+        ${thS.map((s) => `<div class="read-session"><a href="#/sessao/${s.id}">${doneIcon(s.id)} ${TYPE[s.type].label}${s.part ? ` ${s.part}` : ""}</a>${s.sub ? ` <span class="small muted">— ${esc(short(s.sub, 90))}</span>` : ""}</div>${s.reads.map((r) => readItem(r)).join("")}`).join("")}</details>`;
     }).join("");
     const dependents = MODS.filter((x) => x.req.includes(id));
     const evalS = BY_MOD[id].filter((s) => s.type === "avaliacao" && S.scores[s.id] != null);
@@ -436,9 +482,9 @@
         <div class="card"><h3>Ao final você será capaz de</h3><ul class="clean small">${m.outcomes.map((o) => `<li>${esc(o)}</li>`).join("")}</ul></div>
       </div>
       <div class="grid g2" style="margin-top:16px;align-items:start">
-        <div class="card"><h2>Sessões (${BY_MOD[id].length} h)</h2><ul class="list-plain">${BY_MOD[id].map((s) => `<li class="row" style="flex-wrap:nowrap"><span>${S.done[s.id] ? "✅" : "⬜"}</span> ${typeTag(s.type)} <div style="min-width:0"><a href="#/sessao/${s.id}">${sTitle(s)}</a>${sSub(s)}</div></li>`).join("")}</ul></div>
+        <div class="card"><h2>Sessões (${BY_MOD[id].length} h)</h2><ul class="list-plain">${BY_MOD[id].map((s) => `<li class="row" style="flex-wrap:nowrap"><span>${doneIcon(s.id)}</span> ${typeTag(s.type)} <div style="min-width:0"><a href="#/sessao/${s.id}">${sTitle(s)}</a>${sSub(s)}</div></li>`).join("")}</ul></div>
         <div class="stack"><div class="card"><h2>Projeto do módulo</h2>${projectBox(m)}</div>
-        ${allReads.length ? `<div class="card"><div class="spread"><h2 style="margin:0">Plano de leitura</h2><span class="read-prog ${readDone(allReads) === allReads.length ? "full" : ""}">${readDone(allReads)}/${allReads.length} trechos lidos</span></div><p class="small muted">O que ler em cada sessão de teoria, tópico a tópico. A marcação “Lido” é a mesma da sessão e da página Materiais.</p>${readPlan}</div>` : ""}</div>
+        ${allReads.length ? `<div class="card"><div class="spread"><h2 style="margin:0">Plano de leitura e resumos</h2><span class="read-prog ${readDone(allReads) === allReads.length ? "full" : ""}">${readDone(allReads)}/${allReads.length} trechos lidos</span></div><p class="small muted">O que ler em cada sessão de teoria, tópico a tópico, com o resumo de cada tópico e o botão “Já conheço”. A marcação “Lido” é a mesma da sessão e da página Materiais.</p>${readPlan}</div>` : ""}</div>
       </div>`;
   };
 
@@ -562,11 +608,12 @@ snakemake --cores 4   # ou nextflow run main.nf -profile docker
     const byDay = {}; S.log.filter((l) => l.a === "done" && SID[l.id] && S.done[l.id]).forEach((l) => { const k = S.done[l.id]; (byDay[k] = byDay[k] || new Set()).add(l.id); });
     const days = Object.keys(byDay).sort().reverse();
     const scores = Object.entries(S.scores).filter(([id]) => SID[id]);
+    const kDone = [...knownIds()].filter((k) => SID[k] && S.done[k]).length;
     return `<div class="page-head"><h1>Histórico</h1></div>
-      <div class="grid g3"><div class="card kpi"><div class="v">${doneCount(SESS)} h</div><div class="l">estudadas no total</div></div><div class="card kpi"><div class="v">${streak()}</div><div class="l">dias seguidos</div></div><div class="card kpi"><div class="v">${missedDays().length}</div><div class="l">dias de estudo sem registro (reagendados)</div></div></div>
+      <div class="grid g3"><div class="card kpi"><div class="v">${doneCount(SESS) - kDone} h</div><div class="l">estudadas no total${kDone ? ` · ${kDone} sessão(ões) revisada(s) por “já conheço”` : ""}</div></div><div class="card kpi"><div class="v">${streak()}</div><div class="l">dias seguidos</div></div><div class="card kpi"><div class="v">${missedDays().length}</div><div class="l">dias de estudo sem registro (reagendados)</div></div></div>
       <div class="card" style="margin-top:16px"><h2>Últimos 6 meses</h2><div class="heat">${cells.join("")}</div></div>
       ${scores.length ? `<div class="card" style="margin-top:16px"><h2>Avaliações</h2><ul class="list-plain">${scores.map(([id, v]) => `<li class="spread"><a href="#/sessao/${id}">${esc(MOD[SID[id].mod].name)}</a><strong style="color:${v >= 70 ? "var(--ok)" : "var(--warn)"}">${v}</strong></li>`).join("")}</ul></div>` : ""}
-      <div class="card" style="margin-top:16px"><h2>Sessões concluídas</h2>${days.length ? days.map((d) => `<h3 style="margin-top:12px">${fmtLong(d)}</h3><ul class="list-plain">${[...byDay[d]].map((id) => `<li>${typeTag(SID[id].type)} <a href="#/sessao/${id}">${sTitle(SID[id])}</a> <span class="small muted">· ${esc(MOD[SID[id].mod].name)}</span>${S.notes[id] ? `<div class="small muted">📝 ${esc(S.notes[id].slice(0, 160))}</div>` : ""}</li>`).join("")}</ul>`).join("") : '<p class="muted">Nenhuma sessão concluída ainda.</p>'}</div>`;
+      <div class="card" style="margin-top:16px"><h2>Sessões concluídas</h2>${days.length ? days.map((d) => `<h3 style="margin-top:12px">${fmtLong(d)}</h3><ul class="list-plain">${[...byDay[d]].map((id) => `<li>${typeTag(SID[id].type)} <a href="#/sessao/${id}">${sTitle(SID[id])}</a>${isKnownId(id) ? ` <span class="pill">🔁 já conhecia (revisão pelo resumo)</span>` : ""} <span class="small muted">· ${esc(MOD[SID[id].mod].name)}</span>${S.notes[id] ? `<div class="small muted">📝 ${esc(S.notes[id].slice(0, 160))}</div>` : ""}</li>`).join("")}</ul>`).join("") : '<p class="muted">Nenhuma sessão concluída ainda.</p>'}</div>`;
   };
 
   pages.config = () => `<div class="page-head"><h1>Configurações</h1></div>
@@ -610,7 +657,7 @@ snakemake --cores 4   # ou nextflow run main.nf -profile docker
         ${sec(2, "Gêneros, espécies, genes, enzimas e mecanismos", t.key)}
         <h4 style="margin:14px 0 6px">3. Artigos e revisões — o que ler em cada sessão</h4>${(() => {
           const ti = m.topics.findIndex((x) => x.gg === `${P.id}/${t.id}`); if (ti < 0) return t.refs.map(matItem).join("");
-          return BY_MOD[m.id].filter((s) => s.topic === ti && s.readMode === "leitura").map((s) => `<div class="read-session"><a href="#/sessao/${s.id}">${S.done[s.id] ? "✅" : "⬜"} ${TYPE[s.type].label}${s.part ? ` ${s.part}` : ""}</a> <span class="small muted">— ${esc(s.sub)}</span></div>${s.reads.map((r) => readItem(r)).join("")}`).join("");
+          return BY_MOD[m.id].filter((s) => s.topic === ti && s.readMode === "leitura").map((s) => `<div class="read-session"><a href="#/sessao/${s.id}">${doneIcon(s.id)} ${TYPE[s.type].label}${s.part ? ` ${s.part}` : ""}</a> <span class="small muted">— ${esc(s.sub)}</span></div>${s.reads.map((r) => readItem(r)).join("")}`).join("");
         })()}
         ${sec(4, "Relação com os relatórios Conhecimento comercial", t.rel)}
         ${sec(5, "Como interpretar", t.interp)}
@@ -727,6 +774,24 @@ snakemake --cores 4   # ou nextflow run main.nf -profile docker
       document.querySelectorAll(".notes-grid").forEach((g) => { g.className = `notes-grid mode-${S.noteMode}`; });
       document.querySelectorAll("[data-notemode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.notemode === S.noteMode)));
       if (S.noteMode !== "view") document.querySelector("[data-note]")?.focus();
+      return;
+    }
+    const cc = e.target.closest("[data-cheatcopy]");
+    if (cc) {
+      const s = SID[cc.dataset.cheatcopy], txt = CHEATS[`${s.mod}:${s.topic}`], cur = S.notes[s.id] || "";
+      if (cur.includes(txt.trim())) return toast("O resumo já está nas suas anotações.");
+      S.notes[s.id] = cur.trim() ? `${txt.trim()}\n\n---\n\n${cur}` : `${txt.trim()}\n`; save();
+      if (S.noteMode === "view") S.noteMode = "split";
+      rerender(); toast("Resumo copiado para as anotações — edite à vontade.");
+      return;
+    }
+    const kb = e.target.closest("[data-known],[data-unknown]");
+    if (kb) {
+      const open = [...document.querySelectorAll("#app details")].map((d) => d.open);
+      if (kb.dataset.known) { markKnown(kb.dataset.known); toast("Tópico marcado como já conhecido. 🔁"); } else unmarkKnown(kb.dataset.unknown);
+      rerender();
+      const ds = document.querySelectorAll("#app details");
+      if (ds.length === open.length) ds.forEach((d, i) => { d.open = open[i]; });
       return;
     }
     const t = e.target.closest("[data-done],[data-act],[data-cal],[data-day],[data-offtoggle],[data-deloff]"); if (!t) return;
